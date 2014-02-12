@@ -103,7 +103,7 @@ LOCAL_SRC_FILES += ../installfiles/cvd_src/bayer.cc                      \
 
 LOCAL_STATIC_LIBRARIES += TooN
 LOCAL_STATIC_LIBRARIES += cpufeatures
-LOCAL_LDLIBS    += -landroid
+LOCAL_LDLIBS    += -landroid -llog
 
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES) #export includes
 LOCAL_EXPORT_LDLIBS := $(LOCAL_LDLIBS) #export linker cmds

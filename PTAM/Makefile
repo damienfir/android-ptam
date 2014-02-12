@@ -8,11 +8,11 @@ libptam_built:
 	mkdir -p include
 	mkdir -p lib
 	cp build/*.so* lib
-	cp -r build/cvd include
-	touch libcvd_built
+	cp -r build/ptam include
+	touch libptam_built
 
 clean:
 	rm -rf include lib
 	rm -rf build
-	rm -f libcvd_ptam
+	rm -f libptam_built
 

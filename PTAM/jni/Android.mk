@@ -20,20 +20,6 @@ LOCAL_CPP_EXTENSION := .cc
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../installfiles
 LOCAL_MODULE    := PTAM
 
-LOCAL_STATIC_LIBRARIES += TooN
-LOCAL_STATIC_LIBRARIES += cpufeatures
-LOCAL_STATIC_LIBRARIES += cvd
-LOCAL_STATIC_LIBRARIES += gvars3
-LOCAL_LDLIBS    += -landroid
-
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES) #export includes
-LOCAL_EXPORT_LDLIBS := $(LOCAL_LDLIBS) #export linker cmds
-LOCAL_EXPORT_CFLAGS := $(LOCAL_CFLAGS) #export c flgs
-LOCAL_EXPORT_CPPFLAGS := $(LOCAL_CPPFLAGS) #export cpp flgs
-LOCAL_EXPORT_CXXFLAGS := $(LOCAL_CXXFLAGS) #export cpp flgs
-
-include $(BUILD_STATIC_LIBRARY)
-
 LOCAL_SRC_FILES += ../installfiles/ARDriver.cc                      \
 ../installfiles/ATANCamera.cc                       \
 ../installfiles/Bundle.cc                       \
@@ -59,6 +45,19 @@ LOCAL_SRC_FILES += ../installfiles/ARDriver.cc                      \
 ../installfiles/Tracker.cc                      \
 ../installfiles/VideoSource_OSX.cc                      \
 
+LOCAL_STATIC_LIBRARIES += TooN
+LOCAL_STATIC_LIBRARIES += cpufeatures
+LOCAL_STATIC_LIBRARIES += cvd
+LOCAL_STATIC_LIBRARIES += gvars3
+LOCAL_LDLIBS    += -landroid
+
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES) #export includes
+LOCAL_EXPORT_LDLIBS := $(LOCAL_LDLIBS) #export linker cmds
+LOCAL_EXPORT_CFLAGS := $(LOCAL_CFLAGS) #export c flgs
+LOCAL_EXPORT_CPPFLAGS := $(LOCAL_CPPFLAGS) #export cpp flgs
+LOCAL_EXPORT_CXXFLAGS := $(LOCAL_CXXFLAGS) #export cpp flgs
+
+include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_CPP_EXTENSION := .cc
