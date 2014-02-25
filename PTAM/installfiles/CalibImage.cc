@@ -125,17 +125,29 @@ bool CalibImage::MakeFromImage(Image<byte> &im)
     ImageRef irBotRight = mim.size() - irTopLeft;
     ImageRef ir = irTopLeft;
     glPointSize(1);
-    glColor3f(1,0,1);
-    glBegin(GL_POINTS);
+    GLfloat vtx[max(2*(mim.size().x-10)*(mim.size().y-10), 1)];
+    GLfloat col[max(2*(mim.size().x-10)*(mim.size().y-10), 1)];
+    int count = 0;
     int nGate = GV2.GetInt("CameraCalibrator.MeanGate", 10, SILENT);
     do
       if(IsCorner(imBlurred, ir, nGate))
 	{
 	  mvCorners.push_back(ir);
-	  glVertex(ir);
+	  col[4*count]=1.0f;
+	  col[4*count+2]=1.0f;
+	  col[4*count+3]=1.0f;
+	  vtx[2*count]=ir.x;
+	  vtx[2*count+1]=ir.y;
+	  count++;
 	}
     while(ir.next(irTopLeft, irBotRight));
-    glEnd();
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, vtx);
+    glColorPointer(4, GL_FLOAT, 0, col);
+    glDrawArrays(GL_TRIANGLE_FAN,0,count);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
   }
   
   // If there's not enough corners, i.e. camera pointing somewhere random, abort.
@@ -251,16 +263,32 @@ bool CalibImage::ExpandByAngle(int nSrc, int nDirn)
 
 void CalibGridCorner::Draw()
 {
-  glColor3f(0,1,0);
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBegin(GL_LINES);
-  glVertex(Params.v2Pos + Params.m2Warp() * vec(ImageRef( 10,0)));
-  glVertex(Params.v2Pos + Params.m2Warp() * vec(ImageRef(-10,0)));
-  glVertex(Params.v2Pos + Params.m2Warp() * vec(ImageRef( 0, 10)));
-  glVertex(Params.v2Pos + Params.m2Warp() * vec(ImageRef( 0,-10)));
-  glEnd();
+  GLfloat col[] = {
+     0,1,0,1,
+     0,1,0,1,
+     0,1,0,1,
+     0,1,0,1
+  };
+  GLfloat vtx[] = {
+    static_cast<GLfloat>((Params.v2Pos + Params.m2Warp() * vec(ImageRef( 10,0)))[0]),
+    static_cast<GLfloat>((Params.v2Pos + Params.m2Warp() * vec(ImageRef( 10,0)))[1]),
+    static_cast<GLfloat>((Params.v2Pos + Params.m2Warp() * vec(ImageRef(-10,0)))[0]),
+    static_cast<GLfloat>((Params.v2Pos + Params.m2Warp() * vec(ImageRef(-10,0)))[1]),
+    static_cast<GLfloat>((Params.v2Pos + Params.m2Warp() * vec(ImageRef( 0, 10)))[0]),
+    static_cast<GLfloat>((Params.v2Pos + Params.m2Warp() * vec(ImageRef( 0, 10)))[1]),
+    static_cast<GLfloat>((Params.v2Pos + Params.m2Warp() * vec(ImageRef( 0,-10)))[0]),
+    static_cast<GLfloat>((Params.v2Pos + Params.m2Warp() * vec(ImageRef( 0,-10)))[1])
+  };
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vtx);
+  glColorPointer(4, GL_FLOAT, 0, col);
+  glDrawArrays(GL_LINES,0,4);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
@@ -420,38 +448,66 @@ void CalibImage::ExpandByStep(int n)
 void CalibImage::DrawImageGrid()
 {
   glLineWidth(2);
-  glColor3f(0,0,1);
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_BLEND);
-  glBegin(GL_LINES);
+  GLfloat col[4*2*4*((int) mvGridCorners.size())];
+  GLfloat vtx[2*2*4*((int) mvGridCorners.size())];
+  int count = 0;
   
   for(int i=0; i< (int) mvGridCorners.size(); i++)
     {
       for(int dirn=0; dirn<4; dirn++)
 	if(mvGridCorners[i].aNeighborStates[dirn].val > i)
 	  {
-	    glVertex(mvGridCorners[i].Params.v2Pos);
-	    glVertex(mvGridCorners[mvGridCorners[i].aNeighborStates[dirn].val].Params.v2Pos);
+	    col[4*count+2]=1.0f;
+	    col[4*count+3]=1.0f;
+	    vtx[2*count]=mvGridCorners[i].Params.v2Pos[0];
+	    vtx[2*count+1]=mvGridCorners[i].Params.v2Pos[1];
+	    count++;
+	    col[4*count+2]=1.0f;
+	    col[4*count+3]=1.0f;
+	    vtx[2*count]=mvGridCorners[mvGridCorners[i].aNeighborStates[dirn].val].Params.v2Pos[0];
+	    vtx[2*count+1]=mvGridCorners[mvGridCorners[i].aNeighborStates[dirn].val].Params.v2Pos[1];
+	    count++;
 	  }
     }
-  glEnd();
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vtx);
+  glColorPointer(4, GL_FLOAT, 0, col);
+  glDrawArrays(GL_LINES,0,count);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
   
   glPointSize(5);
   glEnable(GL_POINT_SMOOTH);
-  glColor3f(1,1,0);
-  glBegin(GL_POINTS);
+  GLfloat col2[4*((int) mvGridCorners.size())];
+  GLfloat vtx2[2*((int) mvGridCorners.size())];
   for(unsigned int i=0; i<mvGridCorners.size(); i++)
-    glVertex(mvGridCorners[i].Params.v2Pos);
-  glEnd();
+{
+  col2[4*i]=1.0f;
+  col2[4*i+1]=1.0f;
+  col2[4*i+3]=1.0f;
+  vtx2[2*i]=mvGridCorners[i].Params.v2Pos[0];
+  vtx2[2*i+1]=mvGridCorners[i].Params.v2Pos[1];
+}
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vtx2);
+  glColorPointer(4, GL_FLOAT, 0, col2);
+  glDrawArrays(GL_POINTS,0,mvGridCorners.size());
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
 };
 
 void CalibImage::Draw3DGrid(ATANCamera &Camera, bool bDrawErrors)
 {
   glLineWidth(2);
-  glColor3f(0,0,1);
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_BLEND);
-  glBegin(GL_LINES);
+  GLfloat col[4*2*4*((int) mvGridCorners.size())];
+  GLfloat vtx[2*2*4*((int) mvGridCorners.size())];
+  int count = 0;
   
   for(int i=0; i< (int) mvGridCorners.size(); i++)
     {
@@ -460,28 +516,54 @@ void CalibImage::Draw3DGrid(ATANCamera &Camera, bool bDrawErrors)
 	  {
 	    Vector<3> v3; v3[2] = 0.0;
 	    v3.slice<0,2>() = vec(mvGridCorners[i].irGridPos);
-	    glVertex(Camera.Project(project(mse3CamFromWorld * v3)));
+	    col[4*count+2]=1.0f;
+	    col[4*count+3]=1.0f;
+	    vtx[2*count]=Camera.Project(project(mse3CamFromWorld * v3))[0];
+	    vtx[2*count+1]=Camera.Project(project(mse3CamFromWorld * v3))[1];
+	    count++;
 	    v3.slice<0,2>() = vec(mvGridCorners[mvGridCorners[i].aNeighborStates[dirn].val].irGridPos);
-	    glVertex(Camera.Project(project(mse3CamFromWorld * v3)));
+	    col[4*count+2]=1.0f;
+	    col[4*count+3]=1.0f;
+	    vtx[2*count]=Camera.Project(project(mse3CamFromWorld * v3))[0];
+	    vtx[2*count+1]=Camera.Project(project(mse3CamFromWorld * v3))[1];
+	    count++;
 	  }
     }
-  glEnd();
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vtx);
+  glColorPointer(4, GL_FLOAT, 0, col);
+  glDrawArrays(GL_LINES,0,count);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
 
   if(bDrawErrors)
     {
-      glColor3f(1,0,0);
       glLineWidth(1);
-      glBegin(GL_LINES);
+      GLfloat col2[4*2*((int) mvGridCorners.size())];
+      GLfloat vtx2[2*2*((int) mvGridCorners.size())];
       for(int i=0; i< (int) mvGridCorners.size(); i++)
 	{
 	  Vector<3> v3; v3[2] = 0.0;
 	  v3.slice<0,2>() = vec(mvGridCorners[i].irGridPos);
 	  Vector<2> v2Pixels_Projected = Camera.Project(project(mse3CamFromWorld * v3));
 	  Vector<2> v2Error = mvGridCorners[i].Params.v2Pos - v2Pixels_Projected;
-	  glVertex(v2Pixels_Projected);
-	  glVertex(v2Pixels_Projected + 10.0 * v2Error);
+	  col2[8*i]=1.0f;
+	  col2[8*i+3]=1.0f;
+	  col2[8*i+4]=1.0f;
+	  col2[8*i+7]=1.0f;
+	  vtx2[4*i]=v2Pixels_Projected[0];
+	  vtx2[4*i+1]=v2Pixels_Projected[1];
+	  vtx2[4*i+2]=(v2Pixels_Projected + 10.0 * v2Error)[0];
+	  vtx2[4*i+3]=(v2Pixels_Projected + 10.0 * v2Error)[1];
 	}
-      glEnd();
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer(2, GL_FLOAT, 0, vtx2);
+      glColorPointer(4, GL_FLOAT, 0, col2);
+      glDrawArrays(GL_LINES,0,(int) mvGridCorners.size());
+      glDisableClientState(GL_COLOR_ARRAY);
+      glDisableClientState(GL_VERTEX_ARRAY);
     }
 };
 

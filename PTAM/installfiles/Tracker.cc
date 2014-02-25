@@ -8,7 +8,7 @@
 #include "TrackerData.h"
 
 #include <cvd/utility.h>
-#include <cvd/gl_helpers.h>
+#include <cvd/gles1_helpers.h>
 #include <cvd/fast_corner.h>
 #include <cvd/vision.h>
 #include <TooN/wls.h>
@@ -117,10 +117,23 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
       glDrawPixels(mCurrentKF.aLevels[0].im);
       if(GV2.GetInt("Tracker.DrawFASTCorners",0, SILENT))
 	{
-	  glColor3f(1,0,1);  glPointSize(1); glBegin(GL_POINTS);
-	  for(unsigned int i=0; i<mCurrentKF.aLevels[0].vCorners.size(); i++) 
-	    glVertex(mCurrentKF.aLevels[0].vCorners[i]);
-	  glEnd();
+	  glPointSize(1);
+	  GLfloat col[4*mCurrentKF.aLevels[0].vCorners.size()];
+	  GLfloat pts[2*mCurrentKF.aLevels[0].vCorners.size()];
+	  for(unsigned int i=0; i<mCurrentKF.aLevels[0].vCorners.size(); i++) {
+	    col[4*i] = 1.0f;
+	    col[4*i+2] = 1.0f;
+	    col[4*i+3] = 1.0f;
+	    pts[2*i] = mCurrentKF.aLevels[0].vCorners[i].x;
+	    pts[2*i+1] = mCurrentKF.aLevels[0].vCorners[i].y;
+	  }
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer(2, GL_FLOAT, 0, pts);
+      glColorPointer(4, GL_FLOAT, 0, col);
+      glDrawArrays(GL_POINTS,0,mCurrentKF.aLevels[0].vCorners.size());
+      glDisableClientState(GL_COLOR_ARRAY);
+      glDisableClientState(GL_VERTEX_ARRAY);
 	}
     }
   
@@ -232,19 +245,27 @@ void Tracker::RenderGrid()
   glLineWidth(2);
   for(int i=0; i<nTot; i++)
     {
-      glBegin(GL_LINE_STRIP);
+      GLfloat pts[nTot*3];
       for(int j=0; j<nTot; j++)
-	glVertex(imVertices[i][j]);
-      glEnd();
+        for (int k=0; k<3; k++)
+	      pts[3*j+k] = imVertices[i][j][k];
+	  glEnableClientState(GL_VERTEX_ARRAY);
+	  glVertexPointer(3, GL_FLOAT, 0, pts);
+	  glDrawArrays(GL_LINE_STRIP,0,nTot);
+	  glDisableClientState(GL_VERTEX_ARRAY);
       
-      glBegin(GL_LINE_STRIP);
+      GLfloat pts2[nTot*3];
       for(int j=0; j<nTot; j++)
-	glVertex(imVertices[j][i]);
-      glEnd();
+        for (int k=0; k<3; k++)
+	      pts2[3*j+k] = imVertices[j][i][k];
+	  glEnableClientState(GL_VERTEX_ARRAY);
+	  glVertexPointer(3, GL_FLOAT, 0, pts2);
+	  glDrawArrays(GL_LINE_STRIP,0,nTot);
+	  glDisableClientState(GL_VERTEX_ARRAY);
     };
   
   glLineWidth(1);
-  glColor3f(1,0,0);
+  glColor4f(1,0,0,1);
 }
 
 // GUI interface. Stuff commands onto the back of a queue so the tracker handles
@@ -386,8 +407,10 @@ int Tracker::TrailTracking_Advance()
       glEnable(GL_LINE_SMOOTH);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glEnable(GL_BLEND);
-      glBegin(GL_LINES);
     }
+    GLfloat col[8*mlTrails.size()];
+    GLfloat pts[4*mlTrails.size()];
+    int count = 0;
   
   MiniPatch BackwardsPatch;
   Level &lCurrentFrame = mCurrentKF.aLevels[0];
@@ -415,13 +438,26 @@ int Tracker::TrailTracking_Advance()
 	}
       if(mbDraw)
 	{
-	  if(!bFound)
-	    glColor3f(0,1,1); // Failed trails flash purple before dying.
-	  else
-	    glColor3f(1,1,0);
-	  glVertex(trail.irInitialPos);
-	  if(bFound) glColor3f(1,0,0);
-	  glVertex(trail.irCurrentPos);
+	  if(!bFound) {
+	    col[4*count+1] = 1.0f;
+	    col[4*count+2] = 1.0f;
+	    col[4*count+3] = 1.0f; // Failed trails flash purple before dying.
+	  } else{
+	    col[4*count] = 1.0f;
+	    col[4*count+1] = 1.0f;
+	    col[4*count+3] = 1.0f;
+	  }
+	  pts[2*count] = trail.irInitialPos.x;
+	  pts[2*count+1] = trail.irInitialPos.y;
+	  count++;
+	  if(bFound) {
+	    col[4*count] = 1.0f;
+	    col[4*count+1] = 1.0f;
+	    col[4*count+3] = 1.0f;
+	  }
+	  pts[2*count] = trail.irCurrentPos.x;
+	  pts[2*count+1] = trail.irCurrentPos.y;
+	  count++;
 	}
       if(!bFound) // Erase from list of trails if not found this frame.
 	{
@@ -429,8 +465,18 @@ int Tracker::TrailTracking_Advance()
 	}
 	  i = next;
     }
-  if(mbDraw)
-    glEnd();
+  if(mbDraw) {
+ 
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+ 
+    glVertexPointer(2, GL_FLOAT, 0, pts);
+    glColorPointer(4, GL_FLOAT, 0, col);
+    glDrawArrays(GL_LINES,0,count);
+ 
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+  }
 
   mPreviousFrameKF = mCurrentKF;
   return nGoodTrails;
@@ -687,17 +733,32 @@ void Tracker::TrackMap()
       glEnable(GL_BLEND);
       glEnable(GL_POINT_SMOOTH);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glBegin(GL_POINTS);
+      GLfloat pts[2*vIterationSet.size()];
+      GLfloat col[4*vIterationSet.size()];
+      int count = 0;
       for(vector<TrackerData*>::reverse_iterator it = vIterationSet.rbegin();
 	  it!= vIterationSet.rend(); 
 	  it++)
 	{
 	  if(! (*it)->bFound)
 	    continue;
-	  glColor(gavLevelColors[(*it)->nSearchLevel]);
-	  glVertex((*it)->v2Image);
+	  Vector<3> v3col = gavLevelColors[(*it)->nSearchLevel];
+	  Vector<2> v2pts = (*it)->v2Image;
+	  pts[2*count] = v2pts[0];
+	  pts[2*count+1] = v2pts[1];
+	  col[4*count] = v3col[0];
+	  col[4*count+1] = v3col[1];
+	  col[4*count+2] = v3col[2];
+	  col[4*count+3] = 1.0f;
+	  count++;
 	}
-      glEnd();
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer(2, GL_FLOAT, 0, pts);
+      glColorPointer(4, GL_FLOAT, 0, col);
+      glDrawArrays(GL_POINTS,0,count);
+      glDisableClientState(GL_COLOR_ARRAY);
+      glDisableClientState(GL_VERTEX_ARRAY);
       glDisable(GL_BLEND);
     }
   

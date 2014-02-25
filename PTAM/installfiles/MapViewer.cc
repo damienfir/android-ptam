@@ -4,7 +4,7 @@
 #include "LevelHelpers.h"
 #include <iomanip>
 
-#include <cvd/gl_helpers.h>
+#include "OpenGL.h"
 
 using namespace CVD;
 using namespace std;
@@ -23,22 +23,34 @@ void MapViewer::DrawMapDots()
   SetupModelView();
   
   int nForMass = 0;
-  glColor3f(0,1,1);
+  glColor4f(0,1,1,1);
   glPointSize(3);
-  glBegin(GL_POINTS);
   mv3MassCenter = Zeros;
+  GLfloat pts[3*mMap.vpPoints.size()];
+  GLfloat col[4*mMap.vpPoints.size()];
   for(size_t i=0; i<mMap.vpPoints.size(); i++)
     {
       Vector<3> v3Pos = mMap.vpPoints[i]->v3WorldPos;
-      glColor(gavLevelColors[mMap.vpPoints[i]->nSourceLevel]);
+      Vector<3> v3Col = gavLevelColors[mMap.vpPoints[i]->nSourceLevel];
       if(v3Pos * v3Pos < 10000)
 	{
 	  nForMass++;
 	  mv3MassCenter += v3Pos;
 	}
-      glVertex(v3Pos);
+	  for (int j=0; j<3; j++)
+	{
+	  pts[3*i+j]= v3Pos[j];
+	  col[4*i+j]= v3Col[j];
     }
-  glEnd();
+      col[4*i+3]= 1.0f;
+    }
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, pts);
+  glColorPointer(4, GL_FLOAT, 0, col);
+  glDrawArrays(GL_POINTS,0,mMap.vpPoints.size());
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
   mv3MassCenter = mv3MassCenter / (0.1 + nForMass);
 }
 
@@ -49,7 +61,8 @@ void MapViewer::DrawGrid()
   SetupModelView();
   glLineWidth(1);
   
-  glBegin(GL_LINES);
+  GLfloat pts[3*84];
+  GLfloat col[4*84];
   
   // Draw a larger grid around the outside..
   double dGridInterval = 0.1;
@@ -59,59 +72,124 @@ void MapViewer::DrawGrid()
   
   for(int x=-10;x<=10;x+=1)
     {
+      float val;
       if(x==0)
-	glColor3f(1,1,1);
+	val=1.0f;
       else
-	glColor3f(0.3,0.3,0.3);
-      glVertex3d((double)x * 10 * dGridInterval, dMin, 0.0);
-      glVertex3d((double)x * 10 * dGridInterval, dMax, 0.0);
+	val=0.3;
+	  for (int j=0; j<3; j++)
+	{
+	  col[8*(x+10)+j]=val;
+	  col[8*(x+10)+j+4]=val;
+	}
+	  col[8*(x+10)+3]=1;
+	  col[8*(x+10)+7]=1;
+
+	  pts[6*(x+10)]=x * 10 * dGridInterval;
+	  pts[6*(x+10)+1]=dMin;
+	  pts[6*(x+10)+3]=x * 10 * dGridInterval;
+	  pts[6*(x+10)+4]=dMax;
     }
   for(int y=-10;y<=10;y+=1)
     {
+      float val;
       if(y==0)
-	glColor3f(1,1,1);
+	val=1.0f;
       else
-	glColor3f(0.3,0.3,0.3);
-      glVertex3d(dMin, (double)y * 10 *  dGridInterval, 0.0);
-      glVertex3d(dMax, (double)y * 10 * dGridInterval, 0.0);
+	val=0.3;
+	  for (int j=0; j<3; j++)
+	{
+	  col[8*21+8*(y+10)+j]=val;
+	  col[8*21+8*(y+10)+j+4]=val;
+	}
+	  col[8*21+8*(y+10)+3]=1;
+	  col[8*21+8*(y+10)+7]=1;
+
+	  pts[6*21+6*(y+10)]=dMin;
+	  pts[6*21+6*(y+10)+1]=y * 10 * dGridInterval;
+	  pts[6*21+6*(y+10)+3]=dMax;
+	  pts[6*21+6*(y+10)+4]=y * 10 * dGridInterval;
     }
   
-  glEnd();
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, pts);
+  glColorPointer(4, GL_FLOAT, 0, col);
+  glDrawArrays(GL_LINES,0,84);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
 
-  glBegin(GL_LINES);
+  GLfloat pts2[3*84+3*6];
+  GLfloat col2[4*84+4*6];
   dMin = -10.0 * dGridInterval;
   dMax =  10.0 * dGridInterval;
   
   for(int x=-10;x<=10;x++)
     {
+      float val;
       if(x==0)
-	glColor3f(1,1,1);
+	val=1.0f;
       else
-	glColor3f(0.5,0.5,0.5);
+	val=0.5;
+      for (int j=0; j<3; j++)
+	{
+	  col2[8*(x+10)+j]=val;
+	  col2[8*(x+10)+j+4]=val;
+	}
+	  col2[8*(x+10)+3]=1;
+	  col2[8*(x+10)+7]=1;
       
-      glVertex3d((double)x * dGridInterval, dMin, 0.0);
-      glVertex3d((double)x * dGridInterval, dMax, 0.0);
+      pts2[6*(x+10)]=x * dGridInterval;
+	  pts2[6*(x+10)+1]=dMin;
+	  pts2[6*(x+10)+3]=x * dGridInterval;
+	  pts2[6*(x+10)+4]=dMax;
     }
   for(int y=-10;y<=10;y++)
     {
+      float val;
       if(y==0)
-	glColor3f(1,1,1);
+	val=1.0f;
       else
-	glColor3f(0.5,0.5,0.5);
-      glVertex3d(dMin, (double)y * dGridInterval, 0.0);
-      glVertex3d(dMax, (double)y * dGridInterval, 0.0);
+	val=0.5;
+	  for (int j=0; j<3; j++)
+	{
+	  col2[8*21+8*(y+10)+j]=val;
+	  col2[8*21+8*(y+10)+j+4]=val;
+	}
+	  col2[8*21+8*(y+10)+3]=1;
+	  col2[8*21+8*(y+10)+7]=1;
+	  pts2[6*21+6*(y+10)]=dMin;
+	  pts2[6*21+6*(y+10)+1]=y * dGridInterval;
+	  pts2[6*21+6*(y+10)+3]=dMax;
+	  pts2[6*21+6*(y+10)+4]=y * dGridInterval;
     }
   
-  glColor3f(1,0,0);
-  glVertex3d(0,0,0);
-  glVertex3d(1,0,0);
-  glColor3f(0,1,0);
-  glVertex3d(0,0,0);
-  glVertex3d(0,1,0);
-  glColor3f(1,1,1);
-  glVertex3d(0,0,0);
-  glVertex3d(0,0,1);
-  glEnd();
+  col2[8*42]=1.0f;
+  col2[8*42+3]=1.0f;
+  col2[8*42+4]=1.0f;
+  col2[8*42+7]=1.0f;
+  pts2[8*42+3]=1.0f;
+  col2[8*42+9]=1.0f;
+  col2[8*42+11]=1.0f;
+  col2[8*42+13]=1.0f;
+  col2[8*42+15]=1.0f;
+  pts2[8*42+10]=1.0f;
+  col2[8*42+16]=1.0f;
+  col2[8*42+17]=1.0f;
+  col2[8*42+18]=1.0f;
+  col2[8*42+19]=1.0f;
+  col2[8*42+20]=1.0f;
+  col2[8*42+21]=1.0f;
+  col2[8*42+22]=1.0f;
+  col2[8*42+23]=1.0f;
+  pts2[8*42+17]=1.0f;
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, pts2);
+  glColorPointer(4, GL_FLOAT, 0, col2);
+  glDrawArrays(GL_LINES,0,90);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
   
 //   glColor3f(0.8,0.8,0.8);
 //   glRasterPos3f(1.1,0,0);
@@ -137,7 +215,7 @@ void MapViewer::DrawMap(SE3<> se3CamFromWorld)
 
   mGLWindow.SetupViewport();
   glClearColor(0,0,0,0);
-  glClearDepth(1);
+  glClearDepthf(1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -172,7 +250,7 @@ void MapViewer::SetupFrustum()
   glMatrixMode(GL_PROJECTION);  
   glLoadIdentity();
   double zNear = 0.03;
-  glFrustum(-zNear, zNear, 0.75*zNear,-0.75*zNear,zNear,50);
+  glFrustumf(-zNear, zNear, 0.75*zNear,-0.75*zNear,zNear,50);
   glScalef(1,1,-1);
   return;
 };
@@ -196,32 +274,55 @@ void MapViewer::DrawCamera(SE3<> se3CfromW, bool bSmall)
   else
     glLineWidth(3);
   
-  glBegin(GL_LINES);
-  glColor3f(1,0,0);
-  glVertex3f(0.0f, 0.0f, 0.0f);
-  glVertex3f(0.1f, 0.0f, 0.0f);
-  glColor3f(0,1,0);
-  glVertex3f(0.0f, 0.0f, 0.0f);
-  glVertex3f(0.0f, 0.1f, 0.0f);
-  glColor3f(1,1,1);
-  glVertex3f(0.0f, 0.0f, 0.0f);
-  glVertex3f(0.0f, 0.0f, 0.1f);
-  glEnd();
+  GLfloat pts[] = {
+    0,   0,   0,
+    0.1f,0,   0,
+    0,   0,   0,
+    0,   0.1f,0,
+    0,   0,   0,
+    0,   0,   0.1f
+  };
+  GLfloat col[] = {
+    1,0,0,1,
+    1,0,0,1,
+    0,1,0,1,
+    0,1,0,1,
+    1,1,1,1,
+    1,1,1,1
+  };
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, pts);
+  glColorPointer(4, GL_FLOAT, 0, col);
+  glDrawArrays(GL_LINES,0,6);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
 
   
   if(!bSmall)
   {
 	  glLineWidth(1);
-	  glColor3f(0.5,0.5,0.5);
+	  glColor4f(0.5,0.5,0.5,1.0f);
 	  SetupModelView();
 	  Vector<2> v2CamPosXY = se3CfromW.inverse().get_translation().slice<0,2>();
-	  glBegin(GL_LINES);
-	  glColor3f(1,1,1);
-	  glVertex2d(v2CamPosXY[0] - 0.04, v2CamPosXY[1] + 0.04);
-	  glVertex2d(v2CamPosXY[0] + 0.04, v2CamPosXY[1] - 0.04);
-  	  glVertex2d(v2CamPosXY[0] - 0.04, v2CamPosXY[1] - 0.04);
-	  glVertex2d(v2CamPosXY[0] + 0.04, v2CamPosXY[1] + 0.04);
-	  glEnd();
+      GLfloat col[4*4];
+      for (int i=0; i<16; i++)
+    {
+      col[i]=1.0f;
+    }
+      GLfloat pts[] = {
+        static_cast<GLfloat>(v2CamPosXY[0] - 0.04), static_cast<GLfloat>(v2CamPosXY[1] + 0.04),
+        static_cast<GLfloat>(v2CamPosXY[0] + 0.04), static_cast<GLfloat>(v2CamPosXY[1] - 0.04),
+        static_cast<GLfloat>(v2CamPosXY[0] - 0.04), static_cast<GLfloat>(v2CamPosXY[1] - 0.04),
+        static_cast<GLfloat>(v2CamPosXY[0] + 0.04), static_cast<GLfloat>(v2CamPosXY[1] + 0.04)
+      };
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer(2, GL_FLOAT, 0, pts);
+      glColorPointer(4, GL_FLOAT, 0, col);
+      glDrawArrays(GL_LINES,0,4);
+      glDisableClientState(GL_COLOR_ARRAY);
+      glDisableClientState(GL_VERTEX_ARRAY);
   }
   
 }

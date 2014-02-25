@@ -80,7 +80,7 @@ void GLWindow2::DrawMenus()
   glDisable(GL_STENCIL_TEST);
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_TEXTURE_2D);
-  glDisable(GL_TEXTURE_RECTANGLE_ARB);
+  glDisable(GL_TEXTURE_CROP_RECT_OES);
   glDisable(GL_LINE_SMOOTH);
   glDisable(GL_POLYGON_SMOOTH);
   glEnable(GL_BLEND);
@@ -107,21 +107,21 @@ void GLWindow2::SetupUnitOrtho()
 {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(0,1,1,0,0,1);
+  glOrthof(0,1,1,0,0,1);
 }
 
 void GLWindow2::SetupWindowOrtho()
 {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(size());
+  glOrtho(size(),-1,1);
 }
 
 void GLWindow2::SetupVideoOrtho()
 {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(-0.5,(double)mirVideoSize.x - 0.5, (double) mirVideoSize.y - 0.5, -0.5, -1.0, 1.0);
+  glOrthof(-0.5,(double)mirVideoSize.x - 0.5, (double) mirVideoSize.y - 0.5, -0.5, -1.0, 1.0);
 }
 
 void GLWindow2::SetupVideoRasterPosAndZoom()
@@ -177,15 +177,28 @@ void GLWindow2::DrawCaption(string s)
   glColor4f(0,0,0,0.4);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBegin(GL_QUADS);
-  glVertex2d(-0.5, nTopOfBox);
-  glVertex2d(size().x, nTopOfBox);
-  glVertex2d(size().x, size().y);
-  glVertex2d(-0.5, size().y);
-  glEnd();
+  GLfloat vtx[] = {
+    -0.5,                           static_cast<GLfloat>(nTopOfBox),
+    static_cast<GLfloat>(size().x), static_cast<GLfloat>(nTopOfBox),
+    static_cast<GLfloat>(size().x), static_cast<GLfloat>(size().y),
+    -0.5,                           static_cast<GLfloat>(size().y)
+  };
+  GLfloat col[] = {
+    0,0,0,0.4,
+    0,0,0,0.4,
+    0,0,0,0.4,
+    0,0,0,0.4
+  };
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vtx);
+  glColorPointer(4, GL_FLOAT, 0, col);
+  glDrawArrays(GL_TRIANGLE_FAN,0,4);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
   
   // Draw the caption text in yellow
-  glColor3f(1,1,0);      
+  glColor4f(1,1,0,1);      
   PrintString(ImageRef(10,nTopOfBox + 13), s);
 }
 

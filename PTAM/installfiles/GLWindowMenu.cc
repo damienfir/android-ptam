@@ -135,23 +135,33 @@ void GLWindowMenu::GUICommandHandler(string sCommand, string sParams)
 
 void GLWindowMenu::LineBox(int l, int r, int t, int b)
 {
-  glBegin(GL_LINE_STRIP);
-  glVertex2i(l,t);
-  glVertex2i(l,b);
-  glVertex2i(r,b);
-  glVertex2i(r,t);
-  glVertex2i(l,t);
-  glEnd();
+  GLfloat pts[] = {
+    static_cast<GLfloat>(l),static_cast<GLfloat>(t),
+    static_cast<GLfloat>(l),static_cast<GLfloat>(b),
+    static_cast<GLfloat>(r),static_cast<GLfloat>(b),
+    static_cast<GLfloat>(r),static_cast<GLfloat>(t),
+    static_cast<GLfloat>(l),static_cast<GLfloat>(t)
+  };
+  
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, pts);
+  glDrawArrays(GL_LINE_STRIP,0,5);
+  glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void GLWindowMenu::FillBox(int l, int r, int t, int b)
 {
-  glBegin(GL_QUADS);
-  glVertex2i(l,t);
-  glVertex2i(l,b);
-  glVertex2i(r,b);
-  glVertex2i(r,t);
-  glEnd();
+  GLfloat pts[] = {
+    static_cast<GLfloat>(l),static_cast<GLfloat>(t),
+    static_cast<GLfloat>(l),static_cast<GLfloat>(b),
+    static_cast<GLfloat>(r),static_cast<GLfloat>(b),
+    static_cast<GLfloat>(r),static_cast<GLfloat>(t),
+  };
+  
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, pts);
+  glDrawArrays(GL_TRIANGLE_FAN,0,4);
+  glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void GLWindowMenu::Render(int nTop, int nHeight, int nWidth, GLWindow2 &glw)
@@ -166,9 +176,9 @@ void GLWindowMenu::Render(int nTop, int nHeight, int nWidth, GLWindow2 &glw)
   double dAlpha = 0.8;
   if(msCurrentSubMenu=="")  // No Menu selected  - draw little arrow.
     {
-      glColor4d(0,0.5,0,0.5);
+      glColor4f(0,0.5,0,0.5);
       FillBox(mnWidth - 30, mnWidth - 1, mnMenuTop, mnMenuTop + mnMenuHeight);
-      glColor4d(0,1,0,0.5);
+      glColor4f(0,1,0,0.5);
       LineBox(mnWidth - 30, mnWidth - 1, mnMenuTop, mnMenuTop + mnMenuHeight);
       mnLeftMostCoord = mnWidth - 30;
       return;
@@ -183,9 +193,9 @@ void GLWindowMenu::Render(int nTop, int nHeight, int nWidth, GLWindow2 &glw)
       switch(i->type)
 	{
 	case Button:
-	  glColor4d(0,0.5,0,dAlpha);
+	  glColor4f(0,0.5,0,dAlpha);
 	  FillBox(nBase, nBase + *mgvnMenuItemWidth +1, mnMenuTop, mnMenuTop + mnMenuHeight);
-	  glColor4d(0,1,0,dAlpha);
+	  glColor4f(0,1,0,dAlpha);
 	  LineBox(nBase, nBase + *mgvnMenuItemWidth +1, mnMenuTop, mnMenuTop + mnMenuHeight);
 	  glw.PrintString(ImageRef( nBase + 3, mnMenuTop + *mgvnMenuTextOffset),
 			  i->sName);
@@ -193,23 +203,23 @@ void GLWindowMenu::Render(int nTop, int nHeight, int nWidth, GLWindow2 &glw)
 	  
 	case Toggle:
 	  if(*(i->gvnIntValue))
-	    glColor4d(0,0.5,0.5,dAlpha);
+	    glColor4f(0,0.5,0.5,dAlpha);
 	  else
-	    glColor4d(0.5,0,0,dAlpha);
+	    glColor4f(0.5,0,0,dAlpha);
 	  FillBox(nBase, nBase + *mgvnMenuItemWidth +1, mnMenuTop, mnMenuTop + mnMenuHeight);
 	  if(*(i->gvnIntValue))
-	    glColor4d(0,1,0.5,dAlpha);
+	    glColor4f(0,1,0.5,dAlpha);
 	  else
-	    glColor4d(1,0,0,dAlpha);
+	    glColor4f(1,0,0,dAlpha);
 	  LineBox(nBase, nBase + *mgvnMenuItemWidth +1, mnMenuTop, mnMenuTop + mnMenuHeight);
 	  glw.PrintString(ImageRef( nBase + 3, mnMenuTop + *mgvnMenuTextOffset),
 			  i->sName + " " + ((*(i->gvnIntValue))?("On"):("Off")));
 	  break;
 
 	case Monitor:
-	  glColor4d(0,0.5,0.5,dAlpha);
+	  glColor4f(0,0.5,0.5,dAlpha);
 	  FillBox(nBase, nBase + *mgvnMenuItemWidth +1, mnMenuTop, mnMenuTop + mnMenuHeight);
-	  glColor4d(0,1,1,dAlpha);
+	  glColor4f(0,1,1,dAlpha);
 	  LineBox(nBase, nBase + *mgvnMenuItemWidth +1, mnMenuTop, mnMenuTop + mnMenuHeight);
 	  glw.PrintString(ImageRef( nBase + 3, mnMenuTop + *mgvnMenuTextOffset),
 			  i->sName + " " + GV2.StringValue(i->sParam, true));
@@ -217,16 +227,16 @@ void GLWindowMenu::Render(int nTop, int nHeight, int nWidth, GLWindow2 &glw)
 	  
 	case Slider:
 	  {
-	    glColor4d(0.0,0.0,0.5,dAlpha);
+	    glColor4f(0.0,0.0,0.5,dAlpha);
 	    FillBox(nBase, nBase + *mgvnMenuItemWidth +1, mnMenuTop, mnMenuTop + mnMenuHeight);
-	    glColor4d(0.5,0.0,0.5,dAlpha);
+	    glColor4f(0.5,0.0,0.5,dAlpha);
 	    double dFrac = (double) (*(i->gvnIntValue) - i->min) / (i->max - i->min);
 	    if(dFrac<0.0)
 	      dFrac = 0.0;
 	    if(dFrac>1.0)
 	      dFrac = 1.0;
 	    FillBox(nBase, (int) (nBase + dFrac * (*mgvnMenuItemWidth +1)), mnMenuTop, mnMenuTop + mnMenuHeight);
-	    glColor4d(0,1,1,dAlpha);
+	    glColor4f(0,1,1,dAlpha);
 	    LineBox(nBase, nBase + *mgvnMenuItemWidth +1, mnMenuTop, mnMenuTop + mnMenuHeight);
 	    ostringstream ost;
 	    ost << i->sName << " " << *(i->gvnIntValue);
@@ -237,9 +247,9 @@ void GLWindowMenu::Render(int nTop, int nHeight, int nWidth, GLWindow2 &glw)
 	}
       nBase += *mgvnMenuItemWidth;
     };
-  glColor4d(0.5, 0.5, 0,dAlpha);
+  glColor4f(0.5, 0.5, 0,dAlpha);
   FillBox(mnWidth - *mgvnMenuItemWidth, mnWidth-1, mnMenuTop, mnMenuTop + mnMenuHeight);
-  glColor4d(1,1,0,dAlpha);
+  glColor4f(1,1,0,dAlpha);
   LineBox(mnWidth - *mgvnMenuItemWidth, mnWidth-1, mnMenuTop, mnMenuTop + mnMenuHeight);
   ImageRef ir( mnWidth - *mgvnMenuItemWidth + 5, mnMenuTop + *mgvnMenuTextOffset);
   if(msCurrentSubMenu == "Root")

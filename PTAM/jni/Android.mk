@@ -64,7 +64,7 @@ LOCAL_CPP_EXTENSION := .cc
 LOCAL_MODULE    := testptam
 
 LOCAL_LDLIBS +=  -llog -ldl
-LOCAL_LDLIBS    += -landroid -lGLESv2
+LOCAL_LDLIBS    += -landroid -lGLESv1_CM
 LOCAL_SRC_FILES := hello-ptam.cc
 
 LOCAL_STATIC_LIBRARIES += PTAM

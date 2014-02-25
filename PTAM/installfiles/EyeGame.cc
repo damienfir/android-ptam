@@ -9,7 +9,6 @@ EyeGame::EyeGame()
 {
   mdEyeRadius = 0.1;
   mdShadowHalfSize = 2.5 * mdEyeRadius;
-  mbInitialised = false;
 }
 
 void EyeGame::DrawStuff(Vector<3> v3CameraPos)
@@ -50,8 +49,8 @@ void EyeGame::DrawStuff(Vector<3> v3CameraPos)
       
       glLoadIdentity();
       glMultMatrix(ase3WorldFromEye[i]);
-      glScaled(mdEyeRadius, mdEyeRadius, mdEyeRadius);
-      glCallList(mnEyeDisplayList);
+      glScalef(mdEyeRadius, mdEyeRadius, mdEyeRadius);
+      DrawEye();
     }
   
   glDisable(GL_LIGHTING);
@@ -60,17 +59,35 @@ void EyeGame::DrawStuff(Vector<3> v3CameraPos)
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, mnShadowTex);
   glEnable(GL_BLEND);
-  glColor4f(0,0,0,0.5);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0,0);
-  glVertex2d(-mdShadowHalfSize, -mdShadowHalfSize);
-  glTexCoord2f(0,1);
-  glVertex2d(-mdShadowHalfSize,  mdShadowHalfSize);
-  glTexCoord2f(1,1);
-  glVertex2d( mdShadowHalfSize,  mdShadowHalfSize);
-  glTexCoord2f(1,0);
-  glVertex2d( mdShadowHalfSize, -mdShadowHalfSize);
-  glEnd();
+  GLfloat mdshs = static_cast<GLfloat>(mdShadowHalfSize);
+  GLfloat vtx[] = {
+    -mdshs, -mdshs,
+    -mdshs,  mdshs,
+     mdshs,  mdshs,
+     mdshs, -mdshs
+  };
+  GLfloat col[] = {
+    0,0,0,0.5,
+    0,0,0,0.5,
+    0,0,0,0.5,
+    0,0,0,0.5
+  };
+  GLfloat tex[] = {
+    0,0,
+    0,1,
+    1,1,
+    1,0
+  }; 
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY); 
+  glVertexPointer(2, GL_FLOAT, 0, vtx);
+  glTexCoordPointer(2, GL_FLOAT, 0, tex);
+  glColorPointer(4, GL_FLOAT, 0, col);
+  glDrawArrays(GL_TRIANGLE_FAN,0,4);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
@@ -175,11 +192,7 @@ void EyeGame::Init()
 {
   if(mbInitialised) return;
   mbInitialised = true;
-  // Set up the display list for the eyeball.
-  mnEyeDisplayList = glGenLists(1);
-  glNewList(mnEyeDisplayList,GL_COMPILE);
   DrawEye();
-  glEndList();
   MakeShadowTex();
 };
 

@@ -21,8 +21,8 @@ void ARDriver::Init()
   mbInitialised = true;
   mirFBSize = GV3::get<ImageRef>("ARDriver.FrameBufferSize", ImageRef(1200,900), SILENT);
   glGenTextures(1, &mnFrameTex);
-  glBindTexture(GL_TEXTURE_RECTANGLE_ARB,mnFrameTex);
-  glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 
+  glBindTexture(GL_TEXTURE_CROP_RECT_OES,mnFrameTex);
+  glTexImage2D(GL_TEXTURE_CROP_RECT_OES, 0, 
 	       GL_RGBA, mirFrameSize.x, mirFrameSize.y, 0, 
 	       GL_RGBA, GL_UNSIGNED_BYTE, NULL); 
   MakeFrameBuffer();
@@ -46,8 +46,8 @@ void ARDriver::Render(Image<Rgb<byte> > &imFrame, SE3<> se3CfromW)
   mnCounter++;
   
   // Upload the image to our frame texture
-  glBindTexture(GL_TEXTURE_RECTANGLE_ARB, mnFrameTex);
-  glTexSubImage2D(GL_TEXTURE_RECTANGLE_ARB,
+  glBindTexture(GL_TEXTURE_CROP_RECT_OES, mnFrameTex);
+  glTexSubImage2D(GL_TEXTURE_CROP_RECT_OES,
 		  0, 0, 0,
 		  mirFrameSize.x, mirFrameSize.y,
 		  GL_RGB,
@@ -55,11 +55,11 @@ void ARDriver::Render(Image<Rgb<byte> > &imFrame, SE3<> se3CfromW)
 		  imFrame.data());
   
   // Set up rendering to go the FBO, draw undistorted video frame into BG
-  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,mnFrameBuffer);
+  glBindFramebufferOES(GL_FRAMEBUFFER_OES,mnFrameBuffer);
   CheckFramebufferStatus();
   glViewport(0,0,mirFBSize.x,mirFBSize.y);
   DrawFBBackGround();
-  glClearDepth(1);
+  glClearDepthf(1);
   glClear(GL_DEPTH_BUFFER_BIT);
   
   // Set up 3D projection
@@ -80,7 +80,7 @@ void ARDriver::Render(Image<Rgb<byte> > &imFrame, SE3<> se3CfromW)
   glLoadIdentity();
   
   // Set up for drawing 2D stuff:
-  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
+  glBindFramebufferOES(GL_FRAMEBUFFER_OES,0);
   
   DrawDistortedFB();
   
@@ -99,93 +99,114 @@ void ARDriver::MakeFrameBuffer()
   cout << "  ARDriver: Creating FBO... ";
   
   glGenTextures(1, &mnFrameBufferTex);
-  glBindTexture(GL_TEXTURE_RECTANGLE_ARB,mnFrameBufferTex);
-  glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 
+  glBindTexture(GL_TEXTURE_CROP_RECT_OES,mnFrameBufferTex);
+  glTexImage2D(GL_TEXTURE_CROP_RECT_OES, 0, 
 	       GL_RGBA, mirFBSize.x, mirFBSize.y, 0, 
 	       GL_RGBA, GL_UNSIGNED_BYTE, NULL); 
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_CROP_RECT_OES, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_CROP_RECT_OES, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   GLuint DepthBuffer;
-  glGenRenderbuffersEXT(1, &DepthBuffer);
-  glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, DepthBuffer);
-  glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mirFBSize.x, mirFBSize.y);
+  glGenRenderbuffersOES(1, &DepthBuffer);
+  glBindRenderbufferOES(GL_RENDERBUFFER_OES, DepthBuffer);
+  glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT24_OES, mirFBSize.x, mirFBSize.y);
 
-  glGenFramebuffersEXT(1, &mnFrameBuffer);
-  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mnFrameBuffer); 
-  glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, 
-			    GL_TEXTURE_RECTANGLE_ARB, mnFrameBufferTex, 0);
-  glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, 
-  			       GL_RENDERBUFFER_EXT, DepthBuffer);
+  glGenFramebuffersOES(1, &mnFrameBuffer);
+  glBindFramebufferOES(GL_FRAMEBUFFER_OES, mnFrameBuffer); 
+  glFramebufferTexture2DOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, 
+			    GL_TEXTURE_CROP_RECT_OES, mnFrameBufferTex, 0);
+  glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, 
+  			       GL_RENDERBUFFER_OES, DepthBuffer);
   
   CheckFramebufferStatus();
   cout << " .. created FBO." << endl;
-  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+  glBindFramebufferOES(GL_FRAMEBUFFER_OES, 0);
 }
 
 static bool CheckFramebufferStatus()         
 {                                            
   
   GLenum n;                                            
-  n = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-  if(n == GL_FRAMEBUFFER_COMPLETE_EXT)
+  n = glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES);
+  if(n == GL_FRAMEBUFFER_COMPLETE_OES)
     return true; // All good
   
-  cout << "glCheckFrameBufferStatusExt returned an error." << endl;
+  cout << "glCheckFrameBufferStatusOes returned an error." << endl;
   return false;
 };
 
 void ARDriver::DrawFBBackGround()
 {
-  static bool bFirstRun = true;
   static GLuint nList;
   mGLWindow.SetupUnitOrtho();
   
-  glEnable(GL_TEXTURE_RECTANGLE_ARB);
-  glBindTexture(GL_TEXTURE_RECTANGLE_ARB, mnFrameTex);  
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glDisable(GL_POLYGON_SMOOTH);
+  glEnable(GL_TEXTURE_CROP_RECT_OES);
+  glBindTexture(GL_TEXTURE_CROP_RECT_OES, mnFrameTex);  
+  glTexParameteri(GL_TEXTURE_CROP_RECT_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CROP_RECT_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glDisable(GL_BLEND);
-  // Cache the cpu-intesive projections in a display list..
-  if(bFirstRun)
-    {
-      bFirstRun = false;
-      nList = glGenLists(1);
-      glNewList(nList, GL_COMPILE_AND_EXECUTE);
-      glColor3f(1,1,1);
-      // How many grid divisions in the x and y directions to use?
-      int nStepsX = 24; // Pretty arbitrary..
-      int nStepsY = (int) (nStepsX * ((double) mirFrameSize.x / mirFrameSize.y)); // Scaled by aspect ratio
-      if(nStepsY < 2)
-	nStepsY = 2;
-      for(int ystep = 0; ystep< nStepsY; ystep++)
-	{  
-	  glBegin(GL_QUAD_STRIP);
-	  for(int xstep = 0; xstep <= nStepsX; xstep++)
-	    for(int yystep = ystep; yystep<=ystep+1; yystep++) // Two y-coords in one go - magic.
-	      {
-		Vector<2> v2Iter;
-		v2Iter[0] = (double) xstep / nStepsX;
-		v2Iter[1] = (double) yystep / nStepsY;
-		// If this is a border quad, draw a little beyond the
-		// outside of the frame, this avoids strange jaggies
-		// at the edge of the reconstructed frame later:
-		if(xstep == 0 || yystep == 0 || xstep == nStepsX || yystep == nStepsY)
-		  for(int i=0; i<2; i++)
-		    v2Iter[i] = v2Iter[i] * 1.02 - 0.01; 
-		Vector<2> v2UFBDistorted = v2Iter; 
-		Vector<2> v2UFBUnDistorted = mCamera.UFBLinearProject(mCamera.UFBUnProject(v2UFBDistorted));
-		glTexCoord2d(v2UFBDistorted[0] * mirFrameSize.x, v2UFBDistorted[1] * mirFrameSize.y);
-		glVertex(v2UFBUnDistorted);
-	      }
-	  glEnd();
-	}
-      glEndList();
-    }
-  else
-    glCallList(nList);
-  glDisable(GL_TEXTURE_RECTANGLE_ARB);
+
+  // How many grid divisions in the x and y directions to use?
+  int nStepsX = 24; // Pretty arbitrary..
+  int nStepsY = (int) (nStepsX * ((double) mirFrameSize.x / mirFrameSize.y)); // Scaled by aspect ratio
+  if(nStepsY < 2)
+  nStepsY = 2;
+  for(int ystep = 0; ystep< nStepsY; ystep++)
+{  
+  GLfloat col[16];
+  GLfloat vtx1[8];
+  GLfloat vtx2[8];
+  GLfloat tex1[8];
+  GLfloat tex2[8];
+  int count = 0;
+  for (int i = 0; i<16; i++)
+    col[i] = 1.0f;
+  for(int xstep = 0; xstep <= nStepsX; xstep++)
+  {
+	for(int yystep = ystep; yystep<=ystep+1; yystep++) // Two y-coords in one go - magic.
+	  {
+	Vector<2> v2Iter;
+	v2Iter[0] = (double) xstep / nStepsX;
+	v2Iter[1] = (double) yystep / nStepsY;
+	// If this is a border quad, draw a little beyond the
+	// outside of the frame, this avoids strange jaggies
+	// at the edge of the reconstructed frame later:
+	if(xstep == 0 || yystep == 0 || xstep == nStepsX || yystep == nStepsY)
+	  for(int i=0; i<2; i++)
+		v2Iter[i] = v2Iter[i] * 1.02 - 0.01; 
+	Vector<2> v2UFBDistorted = v2Iter; 
+	Vector<2> v2UFBUnDistorted = mCamera.UFBLinearProject(mCamera.UFBUnProject(v2UFBDistorted));
+	tex1[4*(xstep % 2)+2*(yystep-ystep)] = v2UFBDistorted[0] * mirFrameSize.x;
+	tex1[4*(xstep % 2)+2*(yystep-ystep)+1] = v2UFBDistorted[1] * mirFrameSize.y;
+	tex2[(4*(xstep % 2)+2*(yystep-ystep)+4) % 8] = v2UFBDistorted[0] * mirFrameSize.x;
+	tex2[(4*(xstep % 2)+2*(yystep-ystep)+5) % 8] = v2UFBDistorted[1] * mirFrameSize.y;
+	vtx1[4*(xstep % 2)+2*(yystep-ystep)] = v2UFBUnDistorted[0];
+	vtx1[4*(xstep % 2)+2*(yystep-ystep)+1] = v2UFBUnDistorted[1];
+	vtx2[(4*(xstep % 2)+2*(yystep-ystep)+4) % 8] = v2UFBUnDistorted[0];
+	vtx2[(4*(xstep % 2)+2*(yystep-ystep)+5) % 8] = v2UFBUnDistorted[1];
+	  }
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    glColorPointer(4, GL_FLOAT, 0, col);
+    if (xstep % 2 == 1)
+      {
+    glVertexPointer(2, GL_FLOAT, 0, vtx1);
+    glTexCoordPointer(2, GL_FLOAT, 0, tex1);
+      } else if (xstep != 0) {
+    glVertexPointer(2, GL_FLOAT, 0, vtx2);
+    glTexCoordPointer(2, GL_FLOAT, 0, vtx2);
+      }
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  }
+}
+  glDisable(GL_TEXTURE_CROP_RECT_OES);
 }
 
 
@@ -197,44 +218,67 @@ void ARDriver::DrawDistortedFB()
   mGLWindow.SetupUnitOrtho();
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  glEnable(GL_TEXTURE_RECTANGLE_ARB);
-  glBindTexture(GL_TEXTURE_RECTANGLE_ARB, mnFrameBufferTex);  
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glDisable(GL_POLYGON_SMOOTH);
+  glEnable(GL_TEXTURE_CROP_RECT_OES);
+  glBindTexture(GL_TEXTURE_CROP_RECT_OES, mnFrameBufferTex);  
+  glTexParameteri(GL_TEXTURE_CROP_RECT_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CROP_RECT_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glDisable(GL_BLEND);
-  if(bFirstRun)
-    {
-      bFirstRun = false;
-      nList = glGenLists(1);
-      glNewList(nList, GL_COMPILE_AND_EXECUTE);
-      // How many grid divisions in the x and y directions to use?
-      int nStepsX = 24; // Pretty arbitrary..
-      int nStepsY = (int) (nStepsX * ((double) mirFrameSize.x / mirFrameSize.y)); // Scaled by aspect ratio
-      if(nStepsY < 2)
-	nStepsY = 2;
-      glColor3f(1,1,1);
-      for(int ystep = 0; ystep<nStepsY; ystep++)
-	{  
-	  glBegin(GL_QUAD_STRIP);
-	  for(int xstep = 0; xstep<=nStepsX; xstep++)
-	    for(int yystep = ystep; yystep<=ystep + 1; yystep++) // Two y-coords in one go - magic.
-	      {
-		Vector<2> v2Iter;
-		v2Iter[0] = (double) xstep / nStepsX;
-		v2Iter[1] = (double) yystep / nStepsY;
-		Vector<2> v2UFBDistorted = v2Iter; 
-		Vector<2> v2UFBUnDistorted = mCamera.UFBLinearProject(mCamera.UFBUnProject(v2UFBDistorted));
-		glTexCoord2d(v2UFBUnDistorted[0] * mirFBSize.x, (1.0 - v2UFBUnDistorted[1]) * mirFBSize.y);
-		glVertex(v2UFBDistorted);
-	      }	 
-	  glEnd();
-	}
-      glEndList();
-    }
-  else
-    glCallList(nList);
-  glDisable(GL_TEXTURE_RECTANGLE_ARB);
+
+  // How many grid divisions in the x and y directions to use?
+  int nStepsX = 24; // Pretty arbitrary..
+  int nStepsY = (int) (nStepsX * ((double) mirFrameSize.x / mirFrameSize.y)); // Scaled by aspect ratio
+  if(nStepsY < 2)
+nStepsY = 2;
+  for(int ystep = 0; ystep<nStepsY; ystep++)
+{  
+  GLfloat col[16];
+  GLfloat vtx1[8];
+  GLfloat vtx2[8];
+  GLfloat tex1[8];
+  GLfloat tex2[8];
+  int count = 0;
+  for (int i = 0; i<16; i++)
+    col[i] = 1.0f;
+  for(int xstep = 0; xstep<=nStepsX; xstep++)
+  {
+	for(int yystep = ystep; yystep<=ystep + 1; yystep++) // Two y-coords in one go - magic.
+	  {
+	Vector<2> v2Iter;
+	v2Iter[0] = (double) xstep / nStepsX;
+	v2Iter[1] = (double) yystep / nStepsY;
+	Vector<2> v2UFBDistorted = v2Iter; 
+	Vector<2> v2UFBUnDistorted = mCamera.UFBLinearProject(mCamera.UFBUnProject(v2UFBDistorted));
+	tex1[4*(xstep % 2)+2*(yystep-ystep)] = v2UFBUnDistorted[0] * mirFBSize.x;
+	tex1[4*(xstep % 2)+2*(yystep-ystep)+1] = (1.0 - v2UFBUnDistorted[1]) * mirFBSize.y;
+	tex2[(4*(xstep % 2)+2*(yystep-ystep)+4) % 8] = v2UFBUnDistorted[0] * mirFBSize.x;
+	tex2[(4*(xstep % 2)+2*(yystep-ystep)+5) % 8] = (1.0 - v2UFBUnDistorted[1]) * mirFBSize.y;
+	vtx1[4*(xstep % 2)+2*(yystep-ystep)] = v2UFBDistorted[0];
+	vtx1[4*(xstep % 2)+2*(yystep-ystep)+1] = v2UFBDistorted[1];
+	vtx2[(4*(xstep % 2)+2*(yystep-ystep)+4) % 8] = v2UFBDistorted[0];
+	vtx2[(4*(xstep % 2)+2*(yystep-ystep)+5) % 8] = v2UFBDistorted[1];
+	  }	 
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    glColorPointer(4, GL_FLOAT, 0, col);
+    if (xstep % 2 == 1)
+      {
+    glVertexPointer(2, GL_FLOAT, 0, vtx1);
+    glTexCoordPointer(2, GL_FLOAT, 0, tex1);
+      } else if (xstep != 0) {
+    glVertexPointer(2, GL_FLOAT, 0, vtx2);
+    glTexCoordPointer(2, GL_FLOAT, 0, vtx2);
+      }
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  }
+}
+  glDisable(GL_TEXTURE_CROP_RECT_OES);
 }
 
 void ARDriver::DrawFadingGrid()
@@ -268,15 +312,23 @@ void ARDriver::DrawFadingGrid()
   glLineWidth(2);
   for(int i=0; i<nTot; i++)
     {
-      glBegin(GL_LINE_STRIP);
+      GLfloat vtx1[3*nTot];
       for(int j=0; j<nTot; j++)
-	glVertex(aaVertex[i][j]);
-      glEnd();
+	    for(int k=0; k<3; k++)
+	      vtx1[3*j+k] = aaVertex[i][j][k];
+	  glEnableClientState(GL_VERTEX_ARRAY);
+      glVertexPointer(2, GL_FLOAT, 0, vtx1);
+      glDrawArrays(GL_LINE_STRIP,0,nTot);
+      glDisableClientState(GL_VERTEX_ARRAY);
       
-      glBegin(GL_LINE_STRIP);
+      GLfloat vtx2[3*nTot];
       for(int j=0; j<nTot; j++)
-	glVertex(aaVertex[j][i]);
-      glEnd();
+	    for(int k=0; k<3; k++)
+	      vtx2[3*j+k] = aaVertex[j][i][k];
+	  glEnableClientState(GL_VERTEX_ARRAY);
+      glVertexPointer(2, GL_FLOAT, 0, vtx2);
+      glDrawArrays(GL_LINE_STRIP,0,nTot);
+      glDisableClientState(GL_VERTEX_ARRAY);
     };
 };
 

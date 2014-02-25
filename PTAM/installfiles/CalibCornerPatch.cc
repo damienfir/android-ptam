@@ -94,10 +94,15 @@ bool CalibCornerPatch::IterateOnImageWithDrawing(CalibCornerPatch::Params &param
   if(!bReturn)
     {
       glPointSize(3);
-      glColor3f(1,0,0);
-      glBegin(GL_POINTS);
-      glVertex(params.v2Pos);
-      glEnd();
+      GLfloat col[] = {1,0,0,1};
+      GLfloat vtx[] = {static_cast<GLfloat>(params.v2Pos[0]), static_cast<GLfloat>(params.v2Pos[1])};
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer(2, GL_FLOAT, 0, vtx);
+      glColorPointer(4, GL_FLOAT, 0, col);
+      glDrawArrays(GL_POINTS,0,1);
+      glDisableClientState(GL_COLOR_ARRAY);
+      glDisableClientState(GL_VERTEX_ARRAY);
     }
   return bReturn;
 }
