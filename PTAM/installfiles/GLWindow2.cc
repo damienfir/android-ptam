@@ -33,7 +33,7 @@ GLWindow2::GLWindow2(ImageRef irSize, string sTitle)
 
   mirVideoSize = irSize;
   GUI.RegisterCommand("GLWindow.AddMenu", GUICommandCallBack, this);
-  glSetFont("sans");
+  //glSetFont("sans");
   mvMCPoseUpdate=Zeros;
   mvLeftPoseUpdate=Zeros;
 };
@@ -82,7 +82,7 @@ void GLWindow2::DrawMenus()
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_TEXTURE_CROP_RECT_OES);
   glDisable(GL_LINE_SMOOTH);
-  glDisable(GL_POLYGON_SMOOTH);
+  //glDisable(GL_POLYGON_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glColorMask(1,1,1,1);
@@ -126,11 +126,11 @@ void GLWindow2::SetupVideoOrtho()
 
 void GLWindow2::SetupVideoRasterPosAndZoom()
 { 
-  glRasterPos2d(-0.5,-0.5);
+  //glRasterPos2d(-0.5,-0.5);
   double adZoom[2];
   adZoom[0] = (double) size()[0] / (double) mirVideoSize[0];
   adZoom[1] = (double) size()[1] / (double) mirVideoSize[1];
-  glPixelZoom(adZoom[0], -adZoom[1]);
+  //glPixelZoom(adZoom[0], -adZoom[1]);
 }
 
 void GLWindow2::SetupViewport()
@@ -144,7 +144,7 @@ void GLWindow2::PrintString(CVD::ImageRef irPos, std::string s)
   glPushMatrix();
   glTranslatef(irPos.x, irPos.y, 0.0);
   glScalef(8,-8,1);
-  glDrawText(s, NICE, 1.6, 0.1);
+  //glDrawText(s, NICE, 1.6, 0.1);
   glPopMatrix();
 }
 

@@ -140,7 +140,7 @@ void ARDriver::DrawFBBackGround()
   static GLuint nList;
   mGLWindow.SetupUnitOrtho();
   
-  glDisable(GL_POLYGON_SMOOTH);
+  //glDisable(GL_POLYGON_SMOOTH);
   glEnable(GL_TEXTURE_CROP_RECT_OES);
   glBindTexture(GL_TEXTURE_CROP_RECT_OES, mnFrameTex);  
   glTexParameteri(GL_TEXTURE_CROP_RECT_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -218,7 +218,7 @@ void ARDriver::DrawDistortedFB()
   mGLWindow.SetupUnitOrtho();
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  glDisable(GL_POLYGON_SMOOTH);
+  //glDisable(GL_POLYGON_SMOOTH);
   glEnable(GL_TEXTURE_CROP_RECT_OES);
   glBindTexture(GL_TEXTURE_CROP_RECT_OES, mnFrameBufferTex);  
   glTexParameteri(GL_TEXTURE_CROP_RECT_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

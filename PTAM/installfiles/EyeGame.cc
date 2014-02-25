@@ -124,7 +124,7 @@ void EyeGame::DrawEye()
   
   double dSliceAngle = M_PI / (double)(nSlices);
   double dSegAngle = 2.0 * M_PI / (double)(nSegments);
-  
+  /*
   glColor3f(0.0,0.0,0.0);
   {  // North pole:
     double Z = sin(M_PI/2.0 - dSliceAngle);
@@ -185,7 +185,7 @@ void EyeGame::DrawEye()
     glNormal3f(0,R,-Z);
     glVertex3f(0,R,-Z);
     glEnd();
-  };
+  };*/
 }
 
 void EyeGame::Init()

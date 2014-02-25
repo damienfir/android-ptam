@@ -114,7 +114,7 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
   
   if(mbDraw)
     {
-      glDrawPixels(mCurrentKF.aLevels[0].im);
+      //glDrawPixels(mCurrentKF.aLevels[0].im);
       if(GV2.GetInt("Tracker.DrawFASTCorners",0, SILENT))
 	{
 	  glPointSize(1);

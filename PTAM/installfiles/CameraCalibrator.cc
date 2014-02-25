@@ -94,7 +94,7 @@ void CameraCalibrator::Run()
       if(!*mgvnOptimizing)
 	{
 	  GUI.ParseLine("CalibMenu.ShowMenu Live");
-	  glDrawPixels(imFrameBW);
+	  //glDrawPixels(imFrameBW);
 	  
 	  CalibImage c;
 	  if(c.MakeFromImage(imFrameBW))
@@ -120,7 +120,7 @@ void CameraCalibrator::Run()
 	    nToShow = mvCalibImgs.size()-1;
 	  *mgvnShowImage = nToShow + 1;
       
-	  glDrawPixels(mvCalibImgs[nToShow].mim);
+	  //glDrawPixels(mvCalibImgs[nToShow].mim);
 	  mvCalibImgs[nToShow].Draw3DGrid(mCamera,true);
 	}
       
