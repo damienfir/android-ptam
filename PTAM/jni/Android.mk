@@ -31,7 +31,6 @@ LOCAL_SRC_FILES += ../installfiles/ARDriver.cc                      \
 ../installfiles/GLWindowMenu.cc                      \
 ../installfiles/HomographyInit.cc                      \
 ../installfiles/KeyFrame.cc                      \
-../installfiles/main.cc                      \
 ../installfiles/Map.cc                      \
 ../installfiles/MapMaker.cc                      \
 ../installfiles/MapPoint.cc                      \
@@ -43,7 +42,6 @@ LOCAL_SRC_FILES += ../installfiles/ARDriver.cc                      \
 ../installfiles/SmallBlurryImage.cc                      \
 ../installfiles/System.cc                      \
 ../installfiles/Tracker.cc                      \
-../installfiles/VideoSource_OSX.cc                      \
 
 LOCAL_STATIC_LIBRARIES += TooN
 LOCAL_STATIC_LIBRARIES += cpufeatures
@@ -66,6 +64,7 @@ LOCAL_MODULE    := testptam
 LOCAL_LDLIBS +=  -llog -ldl
 LOCAL_LDLIBS    += -landroid -lGLESv1_CM
 LOCAL_SRC_FILES := hello-ptam.cc
+LOCAL_SRC_FILES += VideoSource_Android.cc
 
 LOCAL_STATIC_LIBRARIES += PTAM
 LOCAL_STATIC_LIBRARIES += cpufeatures

@@ -28,4 +28,6 @@ class VideoSource
  private:
   void *mptr;
   CVD::ImageRef mirSize;
+  void getSize(int * sizeBuffer);
+  void getFrame(CVD::Image<CVD::byte>* imBW, CVD::Image<CVD::Rgb<CVD::byte> >* imRGB, int width, int height);
 };
