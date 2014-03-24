@@ -10,8 +10,8 @@ using namespace CVD;
 using namespace std;
 
 
-MapViewer::MapViewer(Map &map, GLWindow2 &glw):
-  mMap(map), mGLWindow(glw)
+MapViewer::MapViewer(Map &map/*, GLWindow2 &glw*/):
+  mMap(map)//, mGLWindow(glw)
 {
   mse3ViewerFromWorld = 
     SE3<>::exp(makeVector(0,0,2,0,0,0)) * SE3<>::exp(makeVector(0,0,0,0.8 * M_PI,0,0));
@@ -206,14 +206,14 @@ void MapViewer::DrawMap(SE3<> se3CamFromWorld)
   
   // Update viewer position according to mouse input:
   {
-    pair<Vector<6>, Vector<6> > pv6 = mGLWindow.GetMousePoseUpdate();
+    //pair<Vector<6>, Vector<6> > pv6 = mGLWindow.GetMousePoseUpdate();
     SE3<> se3CamFromMC;
     se3CamFromMC.get_translation() = mse3ViewerFromWorld * mv3MassCenter;
-    mse3ViewerFromWorld = SE3<>::exp(pv6.first) * 
-      se3CamFromMC * SE3<>::exp(pv6.second) * se3CamFromMC.inverse() * mse3ViewerFromWorld;
+    //mse3ViewerFromWorld = SE3<>::exp(pv6.first) * 
+    //  se3CamFromMC * SE3<>::exp(pv6.second) * se3CamFromMC.inverse() * mse3ViewerFromWorld;
   }
 
-  mGLWindow.SetupViewport();
+  //mGLWindow.SetupViewport();
   glClearColor(0,0,0,0);
   glClearDepthf(1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

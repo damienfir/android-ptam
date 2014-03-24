@@ -27,7 +27,6 @@ LOCAL_SRC_FILES += ../installfiles/ARDriver.cc                      \
 ../installfiles/CalibImage.cc                      \
 ../installfiles/CameraCalibrator.cc                      \
 ../installfiles/EyeGame.cc                      \
-../installfiles/GLWindow2.cc                      \
 ../installfiles/GLWindowMenu.cc                      \
 ../installfiles/HomographyInit.cc                      \
 ../installfiles/KeyFrame.cc                      \

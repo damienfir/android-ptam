@@ -23,13 +23,13 @@ class Map;
 class MapViewer
 {
 public:
-  MapViewer(Map &map, GLWindow2 &glw);
+  MapViewer(Map &map/*, GLWindow2 &glw*/);
   void DrawMap(SE3<> se3CamFromWorld);
   std::string GetMessageForUser();
   
 protected:
   Map &mMap;
-  GLWindow2 &mGLWindow;
+  //GLWindow2 &mGLWindow;
   
   void DrawGrid();
   void DrawMapDots();

@@ -8,8 +8,8 @@ using namespace std;
 
 static bool CheckFramebufferStatus();
 
-ARDriver::ARDriver(const ATANCamera &cam, ImageRef irFrameSize, GLWindow2 &glw)
-  :mCamera(cam), mGLWindow(glw)
+ARDriver::ARDriver(const ATANCamera &cam, ImageRef irFrameSize/*, GLWindow2 &glw*/)
+  :mCamera(cam)//, mGLWindow(glw)
 {
   mirFrameSize = irFrameSize;
   mCamera.SetImageSize(mirFrameSize);
@@ -86,9 +86,9 @@ void ARDriver::Render(Image<Rgb<byte> > &imFrame, SE3<> se3CfromW)
   
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  mGLWindow.SetupViewport();
-  mGLWindow.SetupVideoOrtho();
-  mGLWindow.SetupVideoRasterPosAndZoom();
+  //mGLWindow.SetupViewport();
+  //mGLWindow.SetupVideoOrtho();
+  //mGLWindow.SetupVideoRasterPosAndZoom();
 }
 
 
@@ -138,7 +138,7 @@ static bool CheckFramebufferStatus()
 void ARDriver::DrawFBBackGround()
 {
   static GLuint nList;
-  mGLWindow.SetupUnitOrtho();
+  //mGLWindow.SetupUnitOrtho();
   
   //glDisable(GL_POLYGON_SMOOTH);
   glEnable(GL_TEXTURE_CROP_RECT_OES);
@@ -214,8 +214,8 @@ void ARDriver::DrawDistortedFB()
 {
   static bool bFirstRun = true;
   static GLuint nList;
-  mGLWindow.SetupViewport();
-  mGLWindow.SetupUnitOrtho();
+  //mGLWindow.SetupViewport();
+  //mGLWindow.SetupUnitOrtho();
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   //glDisable(GL_POLYGON_SMOOTH);

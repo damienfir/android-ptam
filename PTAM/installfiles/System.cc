@@ -8,6 +8,7 @@
 #include "Tracker.h"
 #include "ARDriver.h"
 #include "MapViewer.h"
+#include <android/log.h>
 
 using namespace CVD;
 using namespace std;
@@ -15,13 +16,13 @@ using namespace GVars3;
 
 
 System::System()
-  : mGLWindow(mVideoSource.Size(), "PTAM")
+  //: mGLWindow(mVideoSource.Size(), "PTAM")
 {
   GUI.RegisterCommand("exit", GUICommandCallBack, this);
   GUI.RegisterCommand("quit", GUICommandCallBack, this);
-  
-  mimFrameBW.resize(mVideoSource.Size());
-  mimFrameRGB.resize(mVideoSource.Size());
+
+  /*mimFrameBW.resize(mVideoSource.Size());
+  mimFrameRGB.resize(mVideoSource.Size());*/
   // First, check if the camera is calibrated.
   // If not, we need to run the calibration widget.
   Vector<NUMTRACKERCAMPARAMETERS> vTest;
@@ -35,14 +36,14 @@ System::System()
       cout << endl;
       cout << "! Camera.Parameters is not set, need to run the CameraCalibrator tool" << endl;
       cout << "  and/or put the Camera.Parameters= line into the appropriate .cfg file." << endl;
-      exit(1);
+      /*exit(1);*/
     }
   
   mpMap = new Map;
   mpMapMaker = new MapMaker(*mpMap, *mpCamera);
   mpTracker = new Tracker(mVideoSource.Size(), *mpCamera, *mpMap, *mpMapMaker);
-  mpARDriver = new ARDriver(*mpCamera, mVideoSource.Size(), mGLWindow);
-  mpMapViewer = new MapViewer(*mpMap, mGLWindow);
+  mpARDriver = new ARDriver(*mpCamera, mVideoSource.Size()/*, mGLWindow*/);
+  mpMapViewer = new MapViewer(*mpMap/*, mGLWindow*/);
   
   GUI.ParseLine("GLWindow.AddMenu Menu Menu");
   GUI.ParseLine("Menu.ShowMenu Root");
@@ -58,53 +59,53 @@ System::System()
 
 void System::Run()
 {
-  while(!mbDone)
-    {
+  /*while(!mbDone)
+    {*/
       
       // We use two versions of each video frame:
       // One black and white (for processing by the tracker etc)
       // and one RGB, for drawing.
 
       // Grab new video frame...
-      mVideoSource.GetAndFillFrameBWandRGB(mimFrameBW, mimFrameRGB);  
+      mVideoSource.GetAndFillFrameBWandRGB(mimFrameBW, mimFrameRGB);
       static bool bFirstFrame = true;
       if(bFirstFrame)
 	{
 	  mpARDriver->Init();
 	  bFirstFrame = false;
 	}
-      
-      mGLWindow.SetupViewport();
-      mGLWindow.SetupVideoOrtho();
-      mGLWindow.SetupVideoRasterPosAndZoom();
-      
+
+      //mGLWindow.SetupViewport();
+      //mGLWindow.SetupVideoOrtho();
+      //mGLWindow.SetupVideoRasterPosAndZoom();
+
       if(!mpMap->IsGood())
 	mpARDriver->Reset();
-      
+
       static gvar3<int> gvnDrawMap("DrawMap", 0, HIDDEN|SILENT);
       static gvar3<int> gvnDrawAR("DrawAR", 0, HIDDEN|SILENT);
-      
+
       bool bDrawMap = mpMap->IsGood() && *gvnDrawMap;
       bool bDrawAR = mpMap->IsGood() && *gvnDrawAR;
-      
+
       mpTracker->TrackFrame(mimFrameBW, !bDrawAR && !bDrawMap);
-      
-      if(bDrawMap)
+
+      /*if(bDrawMap)
 	mpMapViewer->DrawMap(mpTracker->GetCurrentPose());
-      else if(bDrawAR)
+      else*//* if(bDrawAR)
 	mpARDriver->Render(mimFrameRGB, mpTracker->GetCurrentPose());
 
       //      mGLWindow.GetMousePoseUpdate();
       string sCaption;
-      if(bDrawMap)
+      /*if(bDrawMap)
 	sCaption = mpMapViewer->GetMessageForUser();
-      else
+      else*//*
 	sCaption = mpTracker->GetMessageForUser();
-      mGLWindow.DrawCaption(sCaption);
-      mGLWindow.DrawMenus();
-      mGLWindow.swap_buffers();
-      mGLWindow.HandlePendingEvents();
-    }
+      //mGLWindow.DrawCaption(sCaption);
+      //mGLWindow.DrawMenus();
+      //mGLWindow.swap_buffers();
+      //mGLWindow.HandlePendingEvents();*/
+    //}
 }
 
 void System::GUICommandCallBack(void *ptr, string sCommand, string sParams)

@@ -97,7 +97,7 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
   static gvar3<double> gvdSBIBlur("Tracker.RotationEstimatorBlur", 0.75, SILENT);
   static gvar3<int> gvnUseSBI("Tracker.UseRotationEstimator", 1, SILENT);
   mbUseSBIInit = *gvnUseSBI;
-  if(!mpSBIThisFrame)
+  /*if(!mpSBIThisFrame)
     {
       mpSBIThisFrame = new SmallBlurryImage(mCurrentKF, *gvdSBIBlur);
       mpSBILastFrame = new SmallBlurryImage(mCurrentKF, *gvdSBIBlur);
@@ -191,7 +191,7 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
     {
       GUICommandHandler(mvQueuedCommands.begin()->sCommand, mvQueuedCommands.begin()->sParams);
       mvQueuedCommands.erase(mvQueuedCommands.begin());
-    }
+    }*/
 };
 
 // Try to relocalise in case tracking was lost.

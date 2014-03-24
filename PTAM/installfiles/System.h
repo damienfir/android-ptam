@@ -32,7 +32,7 @@ public:
   
 private:
   VideoSource mVideoSource;
-  GLWindow2 mGLWindow;
+  //GLWindow2 mGLWindow;
   CVD::Image<CVD::Rgb<CVD::byte> > mimFrameRGB;
   CVD::Image<CVD::byte> mimFrameBW;
   

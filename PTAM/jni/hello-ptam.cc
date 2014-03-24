@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <gvars3/instances.h>
 #include <System.h>
+#include <android/log.h>
 
 using namespace std;
 using namespace GVars3;
@@ -35,6 +36,7 @@ Java_com_ecn_ptam_PTAMActivity_stringFromJNI( JNIEnv* env,
 {
 	env->GetJavaVM(&jvm);
 	std::stringstream ss;
+	__android_log_print(ANDROID_LOG_INFO, "test", "Helloworld");
 
 	ss<<"Testing PTAM: "<<std::endl;
 
@@ -48,7 +50,7 @@ Java_com_ecn_ptam_PTAMActivity_stringFromJNI( JNIEnv* env,
 
 	GUI.StartParserThread(); // Start parsing of the console input
 	atexit(GUI.StopParserThread);
-/*
+
 	try
 		{
 			System s;
@@ -61,7 +63,6 @@ Java_com_ecn_ptam_PTAMActivity_stringFromJNI( JNIEnv* env,
 			ss << "   Exception was: " << std::endl;
 			ss << e.what << std::endl;
 		}
-*/
 }
 
 JNICALL void VideoSource::getSize(int * sizeBuffer) {
