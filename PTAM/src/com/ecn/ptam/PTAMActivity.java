@@ -18,13 +18,12 @@ public class PTAMActivity extends Activity {
 		setContentView(R.layout.main);
 		vs = new VideoSource();
 	}
-
+	
 	@Override
 	public void onResume() {
 		super.onResume();
 		launchVideo();
 		new Thread(new Runnable() {
-
 			@Override
 			public void run() {
 				stringFromJNI();
