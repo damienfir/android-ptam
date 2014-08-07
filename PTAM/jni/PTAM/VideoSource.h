@@ -1,6 +1,3 @@
-#ifndef VIDEOSOURCE_H
-#define VIDEOSOURCE_H
-
 // -*- c++ *--
 // Copyright 2008 Isis Innovation Limited
 //
@@ -23,16 +20,15 @@ struct VideoSourceData;
 
 class VideoSource
 {
- public:
-  VideoSource();
-  void GetAndFillFrameBWandRGB(CVD::Image<CVD::byte> &imBW, CVD::Image<CVD::Rgb<CVD::byte> > &imRGB);
-  CVD::ImageRef Size();
-  
- private:
-  void *mptr;
-  CVD::ImageRef mirSize;
-  void getSize(int * sizeBuffer);
-  void getFrame(CVD::Image<CVD::byte>* imBW, CVD::Image<CVD::Rgb<CVD::byte> >* imRGB, int width, int height);
-};
+public:
+    VideoSource();
+    void GetAndFillFrameBWandRGB(CVD::Image<CVD::byte> &imBW, CVD::Image<CVD::Rgb<CVD::byte> > &imRGB);
+    CVD::ImageRef Size();
 
-#endif /* VIDEOSOURCE_H */
+
+private:
+    void *mptr;
+    CVD::ImageRef mirSize;
+    void getSize(int * sizeBuffer);
+    void getFrame(CVD::Image<CVD::byte> * imB, CVD::Image<CVD::Rgb<CVD::byte> > * imRGB, int width, int height);
+};

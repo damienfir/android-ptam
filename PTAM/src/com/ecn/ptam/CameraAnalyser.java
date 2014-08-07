@@ -3,6 +3,7 @@ package com.ecn.ptam;
 import java.util.concurrent.CountDownLatch;
 
 import android.hardware.Camera;
+import android.util.Log;
 
 public class CameraAnalyser implements Camera.PreviewCallback {
 

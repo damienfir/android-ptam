@@ -5,8 +5,6 @@
 #include <cvd/vision.h>
 #include <cvd/fast_corner.h>
 
-#include <android/log.h>
-
 using namespace CVD;
 using namespace std;
 using namespace GVars3;
@@ -19,8 +17,6 @@ void KeyFrame::MakeKeyFrame_Lite(BasicImage<byte> &im)
   // mapmaker but not the tracker go in MakeKeyFrame_Rest();
   
   // First, copy out the image data to the pyramid's zero level.
-    __android_log_print(ANDROID_LOG_INFO, "Tracker", "size: %d", im.totalsize());
-
   aLevels[0].im.resize(im.size());
   copy(im, aLevels[0].im);
 

@@ -21,9 +21,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
-        // deprecated setting, but required on Android versions prior to 3.0
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        surfaceCreated(mHolder);
+//        surfaceCreated(mHolder);
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
@@ -34,6 +32,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } catch (IOException e) {
             Log.d("error", "Error setting camera preview: " + e.getMessage());
         }
+        PTAMActivity activity = (PTAMActivity)getContext();
+        activity.launchPTAM();
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -67,5 +67,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } catch (Exception e){
             Log.d("error", "Error starting camera preview: " + e.getMessage());
         }
+        Log.i("surface", "surface changed");
     }
 }

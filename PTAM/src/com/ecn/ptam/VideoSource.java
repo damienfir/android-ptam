@@ -1,6 +1,7 @@
 package com.ecn.ptam;
 
 import android.hardware.Camera;
+import android.util.Log;
 
 public class VideoSource {
 
@@ -26,6 +27,7 @@ public class VideoSource {
 	public int[] getSize() {
 		int[] size = { mCamera.getParameters().getPreviewSize().width,
 				mCamera.getParameters().getPreviewSize().height };
+		Log.i("source", "size: " + size[0] + " " + size[1]);
 		return size;
 	}
 
@@ -34,10 +36,10 @@ public class VideoSource {
 	}
 
 	public byte[] getFrame() {
-		byte[] data;
+		byte[] data = null;
 		CameraAnalyser ca = new CameraAnalyser();
-		mCamera.setOneShotPreviewCallback(ca);
-
+		mCamera.setPreviewCallback(ca);
+		
 		try {
 			data = ca.waitResult();
 		} catch (InterruptedException e) {

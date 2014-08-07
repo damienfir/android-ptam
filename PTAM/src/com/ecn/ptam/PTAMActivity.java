@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.os.Bundle;
 
 public class PTAMActivity extends Activity {
 	private CameraPreview mPreview;
 	private static VideoSource vs;
+	private Thread _mainloop;
+	private Thread _updateloop;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -18,17 +21,32 @@ public class PTAMActivity extends Activity {
 		setContentView(R.layout.main);
 		vs = new VideoSource();
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		launchVideo();
-		new Thread(new Runnable() {
+	}
+	
+	public void launchPTAM() {
+		_mainloop = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				stringFromJNI();
+				startPTAM();
 			}
-		}).start();
+		});
+		_mainloop.start();
+		
+//		_updateloop = new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+//				for (int i = 0; i < 1000; ++i) {
+//					double pose[] = get_pose();
+//					Log.i("PTAM", "position: " + pose[0] + " " + pose[1]);
+//				}
+//			}
+//		});
+//		_updateloop.start();
 	}
 
 	public static VideoSource getVideoSource() {
@@ -52,41 +70,36 @@ public class PTAMActivity extends Activity {
 
 	@Override
 	public void onPause() {
-		if (getVideoSource().getCamera() != null) {
-			getVideoSource().getCamera().release();
-		}
 		super.onPause();
 	}
 
 	@Override
 	public void onStop() {
-		if (getVideoSource().getCamera() != null) {
-			getVideoSource().getCamera().release();
-		}
+		_mainloop.interrupt();
+//		_updateloop.interrupt();
+		stopPTAM();
+		camera_release();
 		super.onStop();
 	}
+	
 
 	@Override
 	public void onDestroy() {
-		if (getVideoSource().getCamera() != null) {
-			getVideoSource().getCamera().release();
-		}
+		camera_release();
 		super.onDestroy();
 	}
 
-	/*
-	 * A native method that is implemented by the 'hello-ptam' native library,
-	 * which is packaged with this application.
-	 */
-	public native void stringFromJNI();
+	private void camera_release() {
+		if (getVideoSource().getCamera() != null) {
+			getVideoSource().getCamera().release();
+		}
+	}
+	
+	public native void startPTAM();
+	public native void stopPTAM();
+	public native double[] get_pose();
 
-	/*
-	 * this is used to load the 'hello-ptam' library on application startup. The
-	 * library has already been unpacked into
-	 * /data/data/com.example.HelloJni/lib/libhello-jni.so at installation time
-	 * by the package manager.
-	 */
 	static {
-		System.loadLibrary("testptam");
+		System.loadLibrary("ptam");
 	}
 }
