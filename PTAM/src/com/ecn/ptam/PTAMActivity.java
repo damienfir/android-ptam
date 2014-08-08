@@ -4,9 +4,10 @@ import android.app.Activity;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
-import android.util.Log;
-import android.widget.FrameLayout;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.FrameLayout;
 
 public class PTAMActivity extends Activity {
 	private CameraPreview mPreview;
@@ -32,21 +33,18 @@ public class PTAMActivity extends Activity {
 		_mainloop = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				startPTAM();
+				byte[] im;
+				double[] pos;
+				initPTAM(vs.getSize());
+//				spacePressed();
+				while (!Thread.currentThread().isInterrupted()) {
+					im = vs.getFrame();
+					pos = updatePTAM(im);
+					Log.i("PTAM","Position: "+ pos[0] + " " + pos[1]);
+				}
 			}
 		});
 		_mainloop.start();
-		
-//		_updateloop = new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-//				for (int i = 0; i < 1000; ++i) {
-//					double pose[] = get_pose();
-//					Log.i("PTAM", "position: " + pose[0] + " " + pose[1]);
-//				}
-//			}
-//		});
-//		_updateloop.start();
 	}
 
 	public static VideoSource getVideoSource() {
@@ -76,8 +74,6 @@ public class PTAMActivity extends Activity {
 	@Override
 	public void onStop() {
 		_mainloop.interrupt();
-//		_updateloop.interrupt();
-		stopPTAM();
 		camera_release();
 		super.onStop();
 	}
@@ -95,9 +91,14 @@ public class PTAMActivity extends Activity {
 		}
 	}
 	
-	public native void startPTAM();
-	public native void stopPTAM();
-	public native double[] get_pose();
+	
+	public void spacebarPressed(View v) {
+		sendEventPTAM("Space");
+	}
+	
+	public native void initPTAM(int[] size);
+	public native double[] updatePTAM(byte[] im);
+	public native void sendEventPTAM(String s);
 
 	static {
 		System.loadLibrary("ptam");

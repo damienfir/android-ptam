@@ -25,14 +25,14 @@ class VideoSource
 {
  public:
   VideoSource();
-  void GetAndFillFrameBWandRGB(CVD::Image<CVD::byte> &imBW, CVD::Image<CVD::Rgb<CVD::byte> > &imRGB);
+  void GetAndFillFrameBWandRGB(CVD::Image<CVD::byte> &imBW);
   CVD::ImageRef Size();
   
  private:
   void *mptr;
   CVD::ImageRef mirSize;
   void getSize(int * sizeBuffer);
-  void getFrame(CVD::Image<CVD::byte>* imBW, CVD::Image<CVD::Rgb<CVD::byte> >* imRGB, int width, int height);
+  void getFrame(CVD::Image<CVD::byte>* imBW, int width, int height);
 };
 
 #endif /* VIDEOSOURCE_H */

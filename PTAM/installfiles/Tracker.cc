@@ -18,6 +18,8 @@
 #include <fstream>
 #include <fcntl.h>
 
+#include <android/log.h>
+
 
 using namespace CVD;
 using namespace std;
@@ -85,6 +87,7 @@ void Tracker::Reset()
 // or not (it should not draw, for example, when AR stuff is being shown.)
 void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
 {
+
   mbDraw = bDraw;
   mMessageForUser.str("");   // Wipe the user message clean
   
@@ -97,7 +100,7 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
   static gvar3<double> gvdSBIBlur("Tracker.RotationEstimatorBlur", 0.75, SILENT);
   static gvar3<int> gvnUseSBI("Tracker.UseRotationEstimator", 1, SILENT);
   mbUseSBIInit = *gvnUseSBI;
-  /*if(!mpSBIThisFrame)
+  if(!mpSBIThisFrame)
     {
       mpSBIThisFrame = new SmallBlurryImage(mCurrentKF, *gvdSBIBlur);
       mpSBILastFrame = new SmallBlurryImage(mCurrentKF, *gvdSBIBlur);
@@ -191,7 +194,7 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
     {
       GUICommandHandler(mvQueuedCommands.begin()->sCommand, mvQueuedCommands.begin()->sParams);
       mvQueuedCommands.erase(mvQueuedCommands.begin());
-    }*/
+    }
 };
 
 // Try to relocalise in case tracking was lost.
@@ -332,6 +335,7 @@ void Tracker::TrackForInitialMap()
     {
       if(mbUserPressedSpacebar)  // First spacebar = this is the first keyframe
 	{
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "starting initial map");
 	  mbUserPressedSpacebar = false;
 	  TrailTracking_Start();
 	  mnInitialStage = TRAIL_TRACKING_STARTED;

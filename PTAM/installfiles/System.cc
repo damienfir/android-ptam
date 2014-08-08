@@ -17,7 +17,7 @@ using namespace GVars3;
 
 System* System::_instance = NULL;
 
-System::System()
+System::System(int* size)
     //: mGLWindow(mVideoSource.Size(), "PTAM")
 {
     __android_log_print(ANDROID_LOG_INFO, "System", "creating instance...");
@@ -43,10 +43,12 @@ System::System()
         /*exit(1);*/
     }
 
+    set_size(size);
+
     mpMap = new Map;
     mpMapMaker = new MapMaker(*mpMap, *mpCamera);
-    mpTracker = new Tracker(mVideoSource.Size(), *mpCamera, *mpMap, *mpMapMaker);
-    mpARDriver = new ARDriver(*mpCamera, mVideoSource.Size()/*, mGLWindow*/);
+    mpTracker = new Tracker(imsize, *mpCamera, *mpMap, *mpMapMaker);
+    mpARDriver = new ARDriver(*mpCamera, imsize/*, mGLWindow*/);
     mpMapViewer = new MapViewer(*mpMap/*, mGLWindow*/);
 
     GUI.ParseLine("GLWindow.AddMenu Menu Menu");
@@ -58,64 +60,69 @@ System::System()
     GUI.ParseLine("Menu.AddMenuToggle Root \"View Map\" DrawMap Root");
     GUI.ParseLine("Menu.AddMenuToggle Root \"Draw AR\" DrawAR Root");
 
-    mbDone = false;
+    /* mbDone = false; */
 	__android_log_print(ANDROID_LOG_INFO, "System", "loaded");
 };
 
-void System::Run()
+
+void System::set_size(int* size)
 {
-    while(!mbDone)
-    {
-
-        // We use two versions of each video frame:
-        // One black and white (for processing by the tracker etc)
-        // and one RGB, for drawing.
-
-        // Grab new video frame...
-        mVideoSource.GetAndFillFrameBWandRGB(mimFrameBW, mimFrameRGB);
-        /* static bool bFirstFrame = true; */
-        /* if(bFirstFrame) { */
-        /*     mpARDriver->Init(); */
-        /*     bFirstFrame = false; */
-        /* } */
-
-        //mGLWindow.SetupViewport();
-        //mGLWindow.SetupVideoOrtho();
-        //mGLWindow.SetupVideoRasterPosAndZoom();
-
-        /* if(!mpMap->IsGood()) */
-        /*     mpARDriver->Reset(); */
-
-        /* static gvar3<int> gvnDrawMap("DrawMap", 0, HIDDEN|SILENT); */
-        /* static gvar3<int> gvnDrawAR("DrawAR", 0, HIDDEN|SILENT); */
-
-        /* bool bDrawMap = mpMap->IsGood(); // && *gvnDrawMap; */
-        /* bool bDrawAR = mpMap->IsGood(); // && *gvnDrawAR; */
-
-        mpTracker->TrackFrame(mimFrameBW, false); // !bDrawAR && !bDrawMap);
-
-        /*if(bDrawMap)
-          mpMapViewer->DrawMap(mpTracker->GetCurrentPose());
-          else*//* if(bDrawAR)
-                   mpARDriver->Render(mimFrameRGB, mpTracker->GetCurrentPose());
-
-        //      mGLWindow.GetMousePoseUpdate();
-        string sCaption;
-        if(bDrawMap)
-        sCaption = mpMapViewer->GetMessageForUser();
-        else*//*
-                 sCaption = mpTracker->GetMessageForUser();
-        //mGLWindow.DrawCaption(sCaption);
-        //mGLWindow.DrawMenus();
-        //mGLWindow.swap_buffers();
-        //mGLWindow.HandlePendingEvents();*/
-    }
+    imsize = CVD::ImageRef(size[0], size[1]);
+    mimFrameBW.resize(imsize);
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "resized");
 }
 
 
-void System::stop()
+void System::update_frame(unsigned char* frame, int size)
 {
-    mbDone = true;
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "size = %d", size);
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "pointer = %d", mimFrameBW.totalsize());
+    memcpy(mimFrameBW.data(), frame, imsize[0]*imsize[1]);
+}
+
+
+double* System::update()
+{
+    // Grab new video frame...
+    /* mVideoSource.GetAndFillFrameBWandRGB(mimFrameBW); */
+    /* static bool bFirstFrame = true; */
+    /* if(bFirstFrame) { */
+    /*     mpARDriver->Init(); */
+    /*     bFirstFrame = false; */
+    /* } */
+
+    //mGLWindow.SetupViewport();
+    //mGLWindow.SetupVideoOrtho();
+    //mGLWindow.SetupVideoRasterPosAndZoom();
+
+    /* if(!mpMap->IsGood()) */
+    /*     mpARDriver->Reset(); */
+
+    /* static gvar3<int> gvnDrawMap("DrawMap", 0, HIDDEN|SILENT); */
+    /* static gvar3<int> gvnDrawAR("DrawAR", 0, HIDDEN|SILENT); */
+
+    /* bool bDrawMap = mpMap->IsGood(); // && *gvnDrawMap; */
+    /* bool bDrawAR = mpMap->IsGood(); // && *gvnDrawAR; */
+
+    mpTracker->TrackFrame(mimFrameBW, false); // !bDrawAR && !bDrawMap);
+
+    /*if(bDrawMap)
+      mpMapViewer->DrawMap(mpTracker->GetCurrentPose());
+      else*//* if(bDrawAR)
+               mpARDriver->Render(mimFrameRGB, mpTracker->GetCurrentPose());
+
+    //      mGLWindow.GetMousePoseUpdate();
+    string sCaption;
+    if(bDrawMap)
+    sCaption = mpMapViewer->GetMessageForUser();
+    else*//*
+             sCaption = mpTracker->GetMessageForUser();
+    //mGLWindow.DrawCaption(sCaption);
+    //mGLWindow.DrawMenus();
+    //mGLWindow.swap_buffers();
+    //mGLWindow.HandlePendingEvents();*/
+    
+    return get_pose();
 }
 
 
@@ -129,9 +136,9 @@ double* System::get_pose()
 
 System* System::get_instance()
 {
-    if (!_instance) {
-        _instance = new System();
-    }
+    /* if (!_instance) { */
+    /*     _instance = new System(); */
+    /* } */
     return _instance;
 }
 

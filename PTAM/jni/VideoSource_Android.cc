@@ -38,8 +38,8 @@ ImageRef VideoSource::Size()
   return mirSize;
 };
 
-void JNICALL VideoSource::GetAndFillFrameBWandRGB(Image<byte> &imBW, Image<Rgb<byte> > &imRGB)
+void JNICALL VideoSource::GetAndFillFrameBWandRGB(Image<byte> &imBW)
 {
 	__android_log_print(ANDROID_LOG_INFO, "GetAndFillFrameBWandRGB", "1");
-	getFrame(&imBW, &imRGB, mirSize.x, mirSize.y);
+	getFrame(&imBW, mirSize.x, mirSize.y);
 }

@@ -25,7 +25,6 @@ LOCAL_SRC_FILES += ../installfiles/ARDriver.cc                      \
 				   ../installfiles/Bundle.cc                       \
 				   ../installfiles/CalibCornerPatch.cc                      \
 				   ../installfiles/CalibImage.cc                      \
-				   ../installfiles/CameraCalibrator.cc                      \
 				   ../installfiles/EyeGame.cc                      \
 				   ../installfiles/GLWindowMenu.cc                      \
 				   ../installfiles/HomographyInit.cc                      \
@@ -41,6 +40,7 @@ LOCAL_SRC_FILES += ../installfiles/ARDriver.cc                      \
 				   ../installfiles/SmallBlurryImage.cc                      \
 				   ../installfiles/System.cc                      \
 				   ../installfiles/Tracker.cc                      \
+				   # ../installfiles/CameraCalibrator.cc                      \
 
 LOCAL_STATIC_LIBRARIES += TooN
 LOCAL_STATIC_LIBRARIES += cpufeatures
