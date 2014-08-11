@@ -17,6 +17,7 @@ using namespace GVars3;
 
 System* System::_instance = NULL;
 
+
 System::System(int* size)
     //: mGLWindow(mVideoSource.Size(), "PTAM")
 {
@@ -47,8 +48,8 @@ System::System(int* size)
 
     mpMap = new Map;
     mpMapMaker = new MapMaker(*mpMap, *mpCamera);
-    mpTracker = new Tracker(imsize, *mpCamera, *mpMap, *mpMapMaker);
-    mpARDriver = new ARDriver(*mpCamera, imsize/*, mGLWindow*/);
+    mpTracker = new Tracker(_imsize, *mpCamera, *mpMap, *mpMapMaker);
+    mpARDriver = new ARDriver(*mpCamera, _imsize/*, mGLWindow*/);
     mpMapViewer = new MapViewer(*mpMap/*, mGLWindow*/);
 
     GUI.ParseLine("GLWindow.AddMenu Menu Menu");
@@ -67,17 +68,16 @@ System::System(int* size)
 
 void System::set_size(int* size)
 {
-    imsize = CVD::ImageRef(size[0], size[1]);
-    mimFrameBW.resize(imsize);
+    _imsize = CVD::ImageRef(size[0], size[1]);
+    mimFrameBW.resize(_imsize);
     __android_log_print(ANDROID_LOG_INFO, "PTAM", "resized");
 }
 
 
 void System::update_frame(unsigned char* frame, int size)
 {
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "size = %d", size);
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "pointer = %d", mimFrameBW.totalsize());
-    memcpy(mimFrameBW.data(), frame, imsize[0]*imsize[1]);
+    /* __android_log_print(ANDROID_LOG_INFO, "PTAM", "size = %d", size); */
+    memcpy(mimFrameBW.data(), frame, _imsize[0]*_imsize[1]);
 }
 
 
@@ -104,6 +104,7 @@ double* System::update()
     /* bool bDrawMap = mpMap->IsGood(); // && *gvnDrawMap; */
     /* bool bDrawAR = mpMap->IsGood(); // && *gvnDrawAR; */
 
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "updating tracker");
     mpTracker->TrackFrame(mimFrameBW, false); // !bDrawAR && !bDrawMap);
 
     /*if(bDrawMap)
@@ -122,7 +123,7 @@ double* System::update()
     //mGLWindow.swap_buffers();
     //mGLWindow.HandlePendingEvents();*/
     
-    return get_pose();
+    /* return get_pose(); */
 }
 
 

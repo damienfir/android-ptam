@@ -43,7 +43,7 @@ private:
     /* CVD::Image<CVD::Rgb<CVD::byte> > mimFrameRGB; */
     CVD::Image<CVD::byte> mimFrameBW;
 
-    CVD::ImageRef imsize;
+    CVD::ImageRef _imsize;
 
     Map *mpMap; 
     MapMaker *mpMapMaker; 
