@@ -37,15 +37,8 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAMWrapper_initPTAM( JNIEnv* env, jobj
     env->GetJavaVM(&jvm);
     jvm->AttachCurrentThread(&env, NULL);
 
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "initializing system");
     jint* imsize = env->GetIntArrayElements(size, 0);
     new System(imsize);
-
-    if (System::get_instance() == NULL) {
-        __android_log_print(ANDROID_LOG_INFO, "PTAM", "failed to create singleton");
-    } else {
-        __android_log_print(ANDROID_LOG_INFO, "PTAM", "created singleton");
-    }
 
     /* GUI.LoadFile("settings.cfg"); */
 
@@ -73,7 +66,7 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAMWrapper_sendEventPTAM( JNIEnv* env,
 {
     const char* c = env->GetStringUTFChars(command, 0);
     GUI.CallCallbacks("KeyPress", string(c));
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "space pressed");
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "key pressed");
     env->ReleaseStringUTFChars(command, c);
 }
 
@@ -83,28 +76,20 @@ JNIEXPORT jdoubleArray JNICALL Java_com_ecn_ptam_PTAMWrapper_updatePTAM( JNIEnv*
     env->GetJavaVM(&jvm);
     jvm->AttachCurrentThread(&env, NULL);
 
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "[update] init");
     System* s = System::get_instance();
-    if (s != NULL) {
-        __android_log_print(ANDROID_LOG_INFO, "PTAM", "[update] got instance");
-    }
 
     int len = env->GetArrayLength(array);
     unsigned char * y = (unsigned char *) env->GetByteArrayElements(array, 0);
     if (y != NULL) {
-        __android_log_print(ANDROID_LOG_INFO, "PTAM", "getting pose");
         s->update_frame(y, len);
         env->ReleaseByteArrayElements(array, (jbyte*)y, JNI_ABORT);
     }
 
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "[update] got frame");
     s->update();
 
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "[update] updated");
     double* pose = s->get_pose();
     jdoubleArray ret = env->NewDoubleArray(2);
     env->SetDoubleArrayRegion(ret, 0, 2, pose);
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "[update] got pose");
 
     return ret;
 }

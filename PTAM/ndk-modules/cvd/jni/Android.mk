@@ -97,8 +97,8 @@ LOCAL_SRC_FILES += ../installfiles/cvd_src/bayer.cc                      \
 ../installfiles/pnm_src/text.cc                      \
 ../installfiles/pnm_src/text_write.cc                      \
 ../installfiles/pnm_src/bmp_read.cc                      \
-#../installfiles/cvd_src/glwindow.cc                      \
-../installfiles/cvd_src/gltext.cc                      \
+# ../installfiles/cvd_src/glwindow.cc                      \
+# ../installfiles/cvd_src/gltext.cc                      \
 
 
 LOCAL_STATIC_LIBRARIES += TooN

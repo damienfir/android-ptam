@@ -91,9 +91,9 @@ double* System::update()
     /*     bFirstFrame = false; */
     /* } */
 
-    //mGLWindow.SetupViewport();
-    //mGLWindow.SetupVideoOrtho();
-    //mGLWindow.SetupVideoRasterPosAndZoom();
+    /* mGLWindow->SetupViewport(); */
+    /* mGLWindow->SetupVideoOrtho(); */
+    /* mGLWindow->SetupVideoRasterPosAndZoom(); */
 
     /* if(!mpMap->IsGood()) */
     /*     mpARDriver->Reset(); */
@@ -104,20 +104,19 @@ double* System::update()
     /* bool bDrawMap = mpMap->IsGood(); // && *gvnDrawMap; */
     /* bool bDrawAR = mpMap->IsGood(); // && *gvnDrawAR; */
 
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "updating tracker");
-    mpTracker->TrackFrame(mimFrameBW, false); // !bDrawAR && !bDrawMap);
+    mpTracker->TrackFrame(mimFrameBW, true); // !bDrawAR && !bDrawMap);
 
-    /*if(bDrawMap)
-      mpMapViewer->DrawMap(mpTracker->GetCurrentPose());
-      else*//* if(bDrawAR)
-               mpARDriver->Render(mimFrameRGB, mpTracker->GetCurrentPose());
+    /* if(bDrawMap) */
+      /* mpMapViewer->DrawMap(mpTracker->GetCurrentPose()); */
+      /* else if(bDrawAR) */
+      /*          mpARDriver->Render(mimFrameRGB, mpTracker->GetCurrentPose()); */
 
     //      mGLWindow.GetMousePoseUpdate();
-    string sCaption;
-    if(bDrawMap)
-    sCaption = mpMapViewer->GetMessageForUser();
-    else*//*
-             sCaption = mpTracker->GetMessageForUser();
+    /* string sCaption; */
+    /* if(bDrawMap) */
+    /* sCaption = mpMapViewer->GetMessageForUser(); */
+    /* else*//* */
+             /* sCaption = mpTracker->GetMessageForUser(); */
     //mGLWindow.DrawCaption(sCaption);
     //mGLWindow.DrawMenus();
     //mGLWindow.swap_buffers();

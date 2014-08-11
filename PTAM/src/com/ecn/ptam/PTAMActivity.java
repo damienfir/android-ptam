@@ -1,9 +1,10 @@
 package com.ecn.ptam;
 
 import android.app.Activity;
+import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.view.ViewGroup.LayoutParams;
+import android.view.MotionEvent;
 import android.widget.LinearLayout;
 
 public class PTAMActivity extends Activity {
@@ -15,14 +16,14 @@ public class PTAMActivity extends Activity {
 		
 		
 		LinearLayout layout = new LinearLayout(this);
-		_view = new GLSurfaceView(this);
-		_view.setEGLContextClientVersion(2);
+		_view = new Viewer(this);
+		
 		VideoSource vs = new VideoSource(this);
 		_view.setRenderer(new PTAMRenderer(vs));
 		
 		layout.setOrientation(LinearLayout.VERTICAL);
 		layout.addView(_view, new LinearLayout.LayoutParams(800,500));
-		layout.addView(vs.get_view(), new LinearLayout.LayoutParams(1,1));
+		layout.addView(vs.get_view(), new LinearLayout.LayoutParams(800,500));
 		setContentView(layout);
 	}
 
@@ -51,6 +52,20 @@ public class PTAMActivity extends Activity {
 		super.onDestroy();
 	}
 	
+	
+	class Viewer extends GLSurfaceView {
+
+		public Viewer(Context context) {
+			super(context);
+//			setEGLContextClientVersion(2);
+		}
+		
+		@Override
+		public boolean onTouchEvent(MotionEvent e) {
+			PTAMWrapper.sendEventPTAM("Space");
+			return true;
+		}
+	}
 	
 //	public void spacebarPressed(View v) {
 //		_ptam.sendEventPTAM("Space");

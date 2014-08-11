@@ -11,7 +11,7 @@
 #ifndef __SYSTEM_H
 #define __SYSTEM_H
 #include "VideoSource.h"
-#include "GLWindow2.h"
+/* #include "GLWindow2.h" */
 
 #include <cvd/image.h>
 #include <cvd/rgb.h>
@@ -39,7 +39,7 @@ public:
 
 private:
     /* VideoSource mVideoSource; */
-    //GLWindow2 mGLWindow;
+    /* GLWindow2* mGLWindow; */
     /* CVD::Image<CVD::Rgb<CVD::byte> > mimFrameRGB; */
     CVD::Image<CVD::byte> mimFrameBW;
 

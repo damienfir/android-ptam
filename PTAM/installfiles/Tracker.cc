@@ -120,6 +120,7 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
       //glDrawPixels(mCurrentKF.aLevels[0].im);
       if(GV2.GetInt("Tracker.DrawFASTCorners",0, SILENT))
 	{
+
 	  glPointSize(1);
 	  GLfloat col[4*mCurrentKF.aLevels[0].vCorners.size()];
 	  GLfloat pts[2*mCurrentKF.aLevels[0].vCorners.size()];
@@ -143,6 +144,7 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
   // Decide what to do - if there is a map, try to track the map ...
   if(mMap.IsGood())
     {
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "tracking frame...");
       if(mnLostFrames < 3)  // .. but only if we're not lost!
 	{
 	  if(mbUseSBIInit)
