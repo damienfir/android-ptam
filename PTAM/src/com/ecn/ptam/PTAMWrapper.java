@@ -1,6 +1,5 @@
 package com.ecn.ptam;
 
-
 public class PTAMWrapper {
 
 	static {

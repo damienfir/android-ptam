@@ -74,9 +74,6 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAMWrapper_sendEventPTAM( JNIEnv* env,
 
 JNIEXPORT jdoubleArray JNICALL Java_com_ecn_ptam_PTAMWrapper_updatePTAM( JNIEnv* env, jobject thiz, jbyteArray array )
 {
-    env->GetJavaVM(&jvm);
-    jvm->AttachCurrentThread(&env, NULL);
-
     System* s = System::get_instance();
 
     int len = env->GetArrayLength(array);

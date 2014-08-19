@@ -110,9 +110,6 @@ double* System::get_pose()
 
 System* System::get_instance()
 {
-    /* if (!_instance) { */
-    /*     _instance = new System(); */
-    /* } */
     return _instance;
 }
 
