@@ -35,7 +35,7 @@ public:
     double* get_pose();
     void set_size(int* size);
     void update_frame(unsigned char* frame, int size);
-    double* update();
+    void update();
 
 private:
     /* VideoSource mVideoSource; */

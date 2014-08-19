@@ -39,6 +39,7 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAMWrapper_initPTAM( JNIEnv* env, jobj
 
     jint* imsize = env->GetIntArrayElements(size, 0);
     new System(imsize);
+    delete imsize;
 
     /* GUI.LoadFile("settings.cfg"); */
 
@@ -83,6 +84,9 @@ JNIEXPORT jdoubleArray JNICALL Java_com_ecn_ptam_PTAMWrapper_updatePTAM( JNIEnv*
     if (y != NULL) {
         s->update_frame(y, len);
         env->ReleaseByteArrayElements(array, (jbyte*)y, JNI_ABORT);
+        delete y;
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "PTAM", "cannot get image");
     }
 
     s->update();
@@ -90,6 +94,7 @@ JNIEXPORT jdoubleArray JNICALL Java_com_ecn_ptam_PTAMWrapper_updatePTAM( JNIEnv*
     double* pose = s->get_pose();
     jdoubleArray ret = env->NewDoubleArray(2);
     env->SetDoubleArrayRegion(ret, 0, 2, pose);
+    delete pose;
 
     return ret;
 }

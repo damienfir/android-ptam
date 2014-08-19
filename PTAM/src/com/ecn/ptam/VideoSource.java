@@ -1,19 +1,18 @@
 package com.ecn.ptam;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
-public class VideoSource implements SurfaceHolder.Callback {
+public class VideoSource {
 
 	private Camera mCamera;
-	private SurfaceView _view;
 
 	public VideoSource(Context context) {
 		if (mCamera == null) {
@@ -21,25 +20,25 @@ public class VideoSource implements SurfaceHolder.Callback {
 		}
 		
 		Parameters newParam = mCamera.getParameters();
+//		List<Camera.Size> sizes = newParam.getSupportedPreviewSizes();
+//		for (int i = 0; i < sizes.size(); i++) {
+//			Log.i("PTAM", "size: "+ sizes.get(i).width + " "+ sizes.get(i).height);
+//		}
+		newParam.setPreviewSize(640, 480);
 		newParam.setPreviewFormat(ImageFormat.YV12);
 		mCamera.setParameters(newParam);
-		
-		
-		_view = new SurfaceView(context);
-		SurfaceHolder holder = _view.getHolder();
-		holder.addCallback(this);
-//		try {
-//			mCamera.setPreviewDisplay(holder);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		mCamera.startPreview();
 	}
 	
-	public SurfaceView get_view() {
-		return _view;
-	}
 	
+	public void set_texture(SurfaceTexture tex) {
+		try {
+			mCamera.setPreviewTexture(tex);
+			mCamera.startPreview();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	/** A safe way to get an instance of the Camera object. */
 	public static Camera getCameraInstance() {
@@ -63,11 +62,22 @@ public class VideoSource implements SurfaceHolder.Callback {
 	public Camera getCamera() {
 		return mCamera;
 	}
-
+	
+	
+	public void camera_release() {
+		if (mCamera != null) {
+			mCamera.release();
+			mCamera = null;
+		}
+	}
+	
+	
 	public byte[] getFrame() {
 		byte[] data = null;
 		CameraAnalyser ca = new CameraAnalyser();
-		mCamera.setPreviewCallback(ca);
+		if (mCamera != null) {
+			mCamera.setOneShotPreviewCallback(ca);
+		}
 		
 		try {
 			data = ca.waitResult();
@@ -78,30 +88,5 @@ public class VideoSource implements SurfaceHolder.Callback {
 		
 //		Log.i("PTAM","got frame");
 		return data;
-	}
-
-	
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int arg1, int arg2, int arg3) {
-		try {
-			mCamera.setPreviewDisplay(holder);
-			mCamera.startPreview();
-			Log.i("PTAM","started preview");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void surfaceCreated(SurfaceHolder arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void surfaceDestroyed(SurfaceHolder arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 }

@@ -118,10 +118,11 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
   if(mbDraw)
     {
       //glDrawPixels(mCurrentKF.aLevels[0].im);
-      if(GV2.GetInt("Tracker.DrawFASTCorners",0, SILENT))
-	{
+      /* if(GV2.GetInt("Tracker.DrawFASTCorners",0, SILENT)) */
+	/* { */
 
-	  glPointSize(1);
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "corners: %d", mCurrentKF.aLevels[0].vCorners.size());
+	  glPointSize(10);
 	  GLfloat col[4*mCurrentKF.aLevels[0].vCorners.size()];
 	  GLfloat pts[2*mCurrentKF.aLevels[0].vCorners.size()];
 	  for(unsigned int i=0; i<mCurrentKF.aLevels[0].vCorners.size(); i++) {
@@ -138,7 +139,7 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
       glDrawArrays(GL_POINTS,0,mCurrentKF.aLevels[0].vCorners.size());
       glDisableClientState(GL_COLOR_ARRAY);
       glDisableClientState(GL_VERTEX_ARRAY);
-	}
+	/* } */
     }
   
   // Decide what to do - if there is a map, try to track the map ...
@@ -353,6 +354,7 @@ void Tracker::TrackForInitialMap()
       if(nGoodTrails < 10) // if most trails have been wiped out, no point continuing.
 	{
 	  Reset();
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "reset initial map");
 	  return;
 	}
       
@@ -366,6 +368,7 @@ void Tracker::TrackForInitialMap()
 							i->irCurrentPos));
 	  mMapMaker.InitFromStereo(mFirstKF, mCurrentKF, vMatches, mse3CamFromWorld);  // This will take some time!
 	  mnInitialStage = TRAIL_TRACKING_COMPLETE;
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "finished initial map");
 	}
       else
 	mMessageForUser << "Translate the camera slowly sideways, and press spacebar again to perform stereo init." << endl;
