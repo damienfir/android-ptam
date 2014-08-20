@@ -32,7 +32,7 @@ extern "C"{
 JavaVM* jvm;
 
 
-JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAMWrapper_initPTAM( JNIEnv* env, jobject thiz, jintArray size)
+JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_init( JNIEnv* env, jobject thiz, jintArray size)
 {
     env->GetJavaVM(&jvm);
     jvm->AttachCurrentThread(&env, NULL);
@@ -63,7 +63,7 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAMWrapper_initPTAM( JNIEnv* env, jobj
 }
 
 
-JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAMWrapper_sendEventPTAM( JNIEnv* env, jobject thiz, jstring command )
+JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_send( JNIEnv* env, jobject thiz, jstring command )
 {
     const char* c = env->GetStringUTFChars(command, 0);
     GUI.CallCallbacks("KeyPress", string(c));
@@ -71,8 +71,18 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAMWrapper_sendEventPTAM( JNIEnv* env,
     env->ReleaseStringUTFChars(command, c);
 }
 
+JNIEXPORT jdoubleArray JNICALL Java_com_ecn_ptam_PTAM_get_matrix( JNIEnv* env, jobject thiz)
+{
+    System* s = System::get_instance();
+    double* mat = s->get_matrix();
+    jdoubleArray ret = env->NewDoubleArray(12);
+    env->SetDoubleArrayRegion(ret, 0, 12, pose);
+    delete mat;
+    return ret;
+}
 
-JNIEXPORT jdoubleArray JNICALL Java_com_ecn_ptam_PTAMWrapper_updatePTAM( JNIEnv* env, jobject thiz, jbyteArray array )
+
+JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_update( JNIEnv* env, jobject thiz, jbyteArray array )
 {
     System* s = System::get_instance();
 
@@ -85,14 +95,6 @@ JNIEXPORT jdoubleArray JNICALL Java_com_ecn_ptam_PTAMWrapper_updatePTAM( JNIEnv*
     } else {
         __android_log_print(ANDROID_LOG_ERROR, "PTAM", "cannot get image");
     }
-
     s->update();
-
-    double* pose = s->get_pose();
-    jdoubleArray ret = env->NewDoubleArray(2);
-    env->SetDoubleArrayRegion(ret, 0, 2, pose);
-    delete pose;
-
-    return ret;
 }
 }

@@ -100,11 +100,22 @@ void System::update()
 }
 
 
-double* System::get_pose()
+double* System::get_matrix()
 {
-    Vector<3> trans = mpTracker->GetCurrentPose().get_translation();;
-    double* pose = new double[2]{trans[0], trans[1]};
-    return pose;
+    SE3<> tform = mpTracker->GetCurrentPose();
+    Matrix<3,3,double> rot = tform.get_rotation().get_matrix();
+    Vector<3,double> trans = tform.get_translation();
+
+    double* mat = new double[12];
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 3; ++j)
+            mat[i*4+j] = rot(i,j);
+    
+    mat[3] = trans[0];
+    mat[7] = trans[1];
+    mat[11] = trans[2];
+
+    return mat;
 }
 
 

@@ -32,7 +32,7 @@ public:
     static System* get_instance();
     static System* _instance;
 
-    double* get_pose();
+    double* get_matrix();
     void set_size(int* size);
     void update_frame(unsigned char* frame, int size);
     void update();

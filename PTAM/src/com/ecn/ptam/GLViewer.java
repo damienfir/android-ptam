@@ -9,7 +9,7 @@ import android.widget.Button;
 class GLViewer extends GLSurfaceView implements View.OnClickListener  {
 	private VideoSource _vs;
 	private BatchRenderer _renderer;
-	private Controller _controller;
+	private CaptureController _controller;
 	
 	private enum State {INIT, STEREO_STARTED, STEREO_ENDED, GOT_OBJECT, RUNNING};
 	private State _state;
@@ -17,14 +17,13 @@ class GLViewer extends GLSurfaceView implements View.OnClickListener  {
 	public GLViewer(Context context) {
 		super(context);
 		setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
-//		setEGLConfigChooser(8,8,8,8,16,0);
 		_state = State.INIT;
 		
 		_vs = new VideoSource();
 		
 		_renderer = new BatchRenderer();
 		_renderer.add_renderer(new CameraRenderer(_vs));
-		_renderer.add_renderer(new PTAMRenderer(_vs));
+		_renderer.add_renderer(new FeedbackRenderer(_vs));
 		
 		setRenderer(_renderer);
 	}
@@ -44,19 +43,19 @@ class GLViewer extends GLSurfaceView implements View.OnClickListener  {
 		
 		switch (_state) {
 		case INIT:
-			PTAMWrapper.sendEventPTAM("Space");
+			PTAM.send("Space");
 			btn.setText("Finish stereo init");
 			_state = State.STEREO_STARTED;
 			break;
 		case STEREO_STARTED:
-			PTAMWrapper.sendEventPTAM("Space");
+			PTAM.send("Space");
 			btn.setText("Store");
 			_state = State.STEREO_ENDED;
 			break;
 		case STEREO_ENDED:
-			Boolean done = _controller.store_location();
+			Boolean done = _controller.store_corner();
 			if (done) {
-				_state = State.BOTTOM_LEFT;
+				_state = State.GOT_OBJECT;
 				btn.setText("Start");
 			}
 			break;
@@ -67,7 +66,6 @@ class GLViewer extends GLSurfaceView implements View.OnClickListener  {
 			break;
 		case RUNNING:
 			_controller.stop_capture();
-			PTAMWrapper.sendEventPTAM("s");
 		default:
 			break;
 		}
