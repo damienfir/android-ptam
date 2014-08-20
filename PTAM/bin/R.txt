@@ -28,7 +28,6 @@ int id horizontal 0x7f040000
 int id left 0x7f040006
 int id right 0x7f040007
 int id start 0x7f040010
-int id surfaceView1 0x7f040012
 int id top 0x7f040004
 int id vertical 0x7f040001
 int layout main 0x7f030000

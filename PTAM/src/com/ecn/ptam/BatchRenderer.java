@@ -21,7 +21,6 @@ public class BatchRenderer implements GLSurfaceView.Renderer {
 	private List<GLRenderer> _list;
 	
 	public BatchRenderer() {
-		Log.i("PTAM","init");
 		_list = new ArrayList<GLRenderer>();
 	}
 	

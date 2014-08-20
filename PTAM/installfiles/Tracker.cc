@@ -243,27 +243,30 @@ void Tracker::RenderGrid()
                 v3Cam[2] = 0.001;
             imVertices[i][j] = mCamera.Project(project(v3Cam));
         }
+
     glEnable(GL_LINE_SMOOTH);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glLineWidth(2);
+    /* glEnable(GL_BLEND); */
+    /* glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
+
+    glLineWidth(10);
     for(int i=0; i<nTot; i++)
     {
-        GLfloat pts[nTot*3];
+        GLfloat pts[nTot*2];
         for(int j=0; j<nTot; j++)
-            for (int k=0; k<3; k++)
-                pts[3*j+k] = imVertices[i][j][k];
+            for (int k=0; k<2; k++) {
+                pts[2*j+k] = imVertices[i][j][k];
+            }
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glVertexPointer(2, GL_FLOAT, 0, pts);
         glDrawArrays(GL_LINE_STRIP,0,nTot);
         glDisableClientState(GL_VERTEX_ARRAY);
 
-        GLfloat pts2[nTot*3];
+        GLfloat pts2[nTot*2];
         for(int j=0; j<nTot; j++)
-            for (int k=0; k<3; k++)
-                pts2[3*j+k] = imVertices[j][i][k];
+            for (int k=0; k<2; k++)
+                pts2[2*j+k] = imVertices[j][i][k];
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, pts2);
+        glVertexPointer(2, GL_FLOAT, 0, pts2);
         glDrawArrays(GL_LINE_STRIP,0,nTot);
         glDisableClientState(GL_VERTEX_ARRAY);
     };
@@ -756,14 +759,15 @@ void Tracker::TrackMap()
             col[4*count+3] = 1.0f;
             count++;
         }
-                glEnableClientState(GL_VERTEX_ARRAY);
-                glEnableClientState(GL_COLOR_ARRAY);
-                glVertexPointer(2, GL_FLOAT, 0, pts);
-                glColorPointer(4, GL_FLOAT, 0, col);
-                glDrawArrays(GL_POINTS,0,count);
-                glDisableClientState(GL_COLOR_ARRAY);
-                glDisableClientState(GL_VERTEX_ARRAY);
-                glDisable(GL_BLEND);
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glColorPointer(4, GL_FLOAT, 0, col);
+        glDrawArrays(GL_POINTS,0,count);
+        glDisableClientState(GL_COLOR_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisable(GL_BLEND);
     }
 
     // Update the current keyframe with info on what was found in the frame.
