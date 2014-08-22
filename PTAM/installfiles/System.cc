@@ -32,6 +32,7 @@ System::System(int* size)
 
     GUI.RegisterCommand("exit", GUICommandCallBack, this);
     GUI.RegisterCommand("quit", GUICommandCallBack, this);
+    GUI.RegisterCommand("KeyPress", GUICommandCallBack, this);
 
     /*mimFrameBW.resize(mVideoSource.Size());
       mimFrameRGB.resize(mVideoSource.Size());*/
@@ -67,6 +68,8 @@ System::System(int* size)
     GUI.ParseLine("Menu.AddMenuToggle Root \"View Map\" DrawMap Root");
     GUI.ParseLine("Menu.AddMenuToggle Root \"Draw AR\" DrawAR Root");
 
+    _capture = new Capture();
+
     /* mbDone = false; */
 	__android_log_print(ANDROID_LOG_INFO, "PTAM", "system loaded");
 };
@@ -97,25 +100,107 @@ void System::update()
     mpTracker->TrackFrame(mimFrameBW, true); // !bDrawAR && !bDrawMap);
 
     glPopMatrix();
+
+    draw_center();
+    draw_rectangle();
 }
 
 
-double* System::get_matrix()
+void System::draw_center()
 {
-    SE3<> tform = mpTracker->GetCurrentPose();
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glPointSize(20);
+    glColor4f(1,0,0,1);
+    float v[] = {0,0};
+    glVertexPointer(2, GL_FLOAT, 0, v);
+    glDrawArrays(GL_POINTS, 0, 1);
+    glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+
+void System::draw_painted()
+{
+    
+}
+
+
+void System::draw_rectangle()
+{
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glMultMatrix(mpCamera->MakeUFBLinearFrustumMatrix(0.005, 100));
+    glMultMatrix(mpTracker->GetCurrentPose());
+     
+    std::vector<Vector<3> > rect = _capture->get_rectangle();
+    
+    if (rect.size() > 0) {
+        if (rect.size() < 3) {
+            rect.push_back(mpTracker->GetCurrentPose().get_translation());
+        }
+        else {
+            rect.push_back(rect[0]);
+        }
+
+        GLfloat* rectf = new float[rect.size()*3];
+        for (size_t i = 0; i < rect.size(); ++i) {
+            rectf[i*3] = -(GLfloat)rect[i][0];
+            rectf[i*3+1] = (GLfloat)rect[i][1];
+            rectf[i*3+2] = 0.f;
+        }
+        
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glLineWidth(5);
+        glColor4f(0,1,0,1);
+        glVertexPointer(3, GL_FLOAT, 0, rectf);
+        glDrawArrays(GL_LINE_STRIP, 0, rect.size());
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
+    
+    glPopMatrix();
+}
+
+
+float* se3_to_float(SE3<> tform) {
     Matrix<3,3,double> rot = tform.get_rotation().get_matrix();
     Vector<3,double> trans = tform.get_translation();
 
-    double* mat = new double[12];
+    float* mat = new float[16];
     for (int i = 0; i < 3; ++i)
         for (int j = 0; j < 3; ++j)
-            mat[i*4+j] = rot(i,j);
+            mat[i*4+j] = (float)rot(j,i); // to column-major matrix
+
+    mat[3] = 0.f;
+    mat[7] = 0.f;
+    mat[11] = 0.f;
+    mat[15] = 1.f;
     
-    mat[3] = trans[0];
-    mat[7] = trans[1];
-    mat[11] = trans[2];
+    mat[12] = (float)trans[0];
+    mat[13] = (float)trans[1];
+    mat[14] = (float)trans[2];
 
     return mat;
+}
+
+
+float* System::get_viewmodel() {
+    SE3<> tform = mpTracker->GetCurrentPose().inverse();
+    return se3_to_float(tform);
+}
+
+
+float* System::get_modelview()
+{
+    SE3<> tform = mpTracker->GetCurrentPose();
+    return se3_to_float(tform);
+}
+
+
+void System::store_corner()
+{
+    bool r = _capture->store_corner(mpTracker->GetCurrentPose());
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "storing corner: %i", (int)r);
 }
 
 
@@ -126,6 +211,13 @@ System* System::get_instance()
 
 void System::GUICommandCallBack(void *ptr, string sCommand, string sParams)
 {
-    if(sCommand=="quit" || sCommand == "exit")
-        static_cast<System*>(ptr)->mbDone = true;
+    System* s = static_cast<System*>(ptr);
+    if(sCommand=="quit" || sCommand == "exit") {
+        s->mbDone = true;
+    }
+    if (sCommand == "KeyPress") {
+        if (sParams == "Enter") {
+            s->store_corner();
+        }
+    }
 }

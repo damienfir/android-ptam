@@ -24,7 +24,7 @@ public class BatchRenderer implements GLSurfaceView.Renderer {
 		_list = new ArrayList<GLRenderer>();
 	}
 	
-	public void add_renderer(GLRenderer renderer) {
+	public void add(GLRenderer renderer) {
 		_list.add(renderer);
 	}
 	

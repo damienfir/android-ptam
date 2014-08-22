@@ -13,6 +13,8 @@
 #include "VideoSource.h"
 /* #include "GLWindow2.h" */
 
+#include "Capture.h"
+
 #include <cvd/image.h>
 #include <cvd/rgb.h>
 #include <cvd/byte.h>
@@ -32,14 +34,14 @@ public:
     static System* get_instance();
     static System* _instance;
 
-    double* get_matrix();
+    float* get_modelview();
+    float* get_viewmodel();
     void set_size(int* size);
     void update_frame(unsigned char* frame, int size);
     void update();
+    void store_corner();
 
 private:
-    /* VideoSource mVideoSource; */
-    /* GLWindow2* mGLWindow; */
     /* CVD::Image<CVD::Rgb<CVD::byte> > mimFrameRGB; */
     CVD::Image<CVD::byte> mimFrameBW;
 
@@ -52,7 +54,12 @@ private:
     ARDriver *mpARDriver;
     MapViewer *mpMapViewer;
 
+    Capture* _capture;
+
     bool mbDone;
+
+    void draw_center();
+    void draw_rectangle();
 
     static void GUICommandCallBack(void* ptr, std::string sCommand, std::string sParams);
 };

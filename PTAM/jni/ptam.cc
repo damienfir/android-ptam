@@ -67,20 +67,29 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_send( JNIEnv* env, jobject thiz, j
 {
     const char* c = env->GetStringUTFChars(command, 0);
     GUI.CallCallbacks("KeyPress", string(c));
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "key pressed");
+    /* __android_log_print(ANDROID_LOG_INFO, "PTAM", "key pressed"); */
     env->ReleaseStringUTFChars(command, c);
 }
 
-JNIEXPORT jdoubleArray JNICALL Java_com_ecn_ptam_PTAM_get_matrix( JNIEnv* env, jobject thiz)
-{
-    System* s = System::get_instance();
-    double* mat = s->get_matrix();
-    jdoubleArray ret = env->NewDoubleArray(12);
-    env->SetDoubleArrayRegion(ret, 0, 12, pose);
-    delete mat;
-    return ret;
-}
+/* JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getModelView( JNIEnv* env, jobject thiz) */
+/* { */
+/*     System* s = System::get_instance(); */
+/*     float* mat = s->get_modelview(); */
+/*     jfloatArray ret = env->NewFloatArray(16); */
+/*     env->SetFloatArrayRegion(ret, 0, 16, mat); */
+/*     delete mat; */
+/*     return ret; */
+/* } */
 
+/* JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getViewModel( JNIEnv* env, jobject thiz) */
+/* { */
+/*     System* s = System::get_instance(); */
+/*     float* mat = s->get_viewmodel(); */
+/*     jfloatArray ret = env->NewFloatArray(16); */
+/*     env->SetFloatArrayRegion(ret, 0, 16, mat); */
+/*     delete mat; */
+/*     return ret; */
+/* } */
 
 JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_update( JNIEnv* env, jobject thiz, jbyteArray array )
 {

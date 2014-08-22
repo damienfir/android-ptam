@@ -24,6 +24,7 @@ LOCAL_SRC_FILES += ../installfiles/ARDriver.cc                      \
 				   ../installfiles/ATANCamera.cc                       \
 				   ../installfiles/Bundle.cc                       \
 				   ../installfiles/CalibCornerPatch.cc                      \
+				   ../installfiles/Capture.cc                      \
 				   ../installfiles/CalibImage.cc                      \
 				   ../installfiles/EyeGame.cc                      \
 				   ../installfiles/GLWindowMenu.cc                      \

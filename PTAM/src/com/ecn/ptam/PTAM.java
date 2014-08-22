@@ -9,6 +9,6 @@ public class PTAM {
 	public static native void init(int[] size);
 	public static native void update(byte[] im);
 	public static native void send(String s);
-	public static native double[] get_pose();
-	public static native double[] get_matrix();
+//	public static native float[] getModelView();
+//	public static native float[] getViewModel();
 }

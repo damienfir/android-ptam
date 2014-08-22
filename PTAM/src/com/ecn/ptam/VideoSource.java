@@ -56,7 +56,6 @@ public class VideoSource implements Camera.PreviewCallback {
 	public int[] getSize() {
 		int[] size = { mCamera.getParameters().getPreviewSize().width,
 				mCamera.getParameters().getPreviewSize().height };
-//		Log.i("source", "size: " + size[0] + " " + size[1]);
 		return size;
 	}
 	
