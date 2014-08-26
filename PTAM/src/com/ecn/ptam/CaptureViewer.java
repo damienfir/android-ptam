@@ -80,6 +80,7 @@ public class CaptureViewer extends GLSurfaceView implements View.OnClickListener
 		case STEREO_ENDED:
 			PTAM.send("Enter");
 			if (PTAM.objectIsGood()) {
+				_logger.write_mat(PTAM.getCorners());
 				_state = State.READY;
 				btn.setText("Start");
 			}

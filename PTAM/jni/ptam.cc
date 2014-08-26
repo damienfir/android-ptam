@@ -40,26 +40,6 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_init( JNIEnv* env, jobject thiz, j
     jint* imsize = env->GetIntArrayElements(size, 0);
     new System(imsize);
     delete imsize;
-
-    /* GUI.LoadFile("settings.cfg"); */
-
-    /* GUI.StartParserThread(); // Start parsing of the console input */
-    /* atexit(GUI.StopParserThread); */
-
-    /* try { */
-    /*     s = System::get_instance(); */
-    /*     __android_log_print(ANDROID_LOG_INFO, "System", "running"); */
-    /*     s->Run(); */
-    /* } */
-    /* catch(CVD::Exceptions::All e) { */
-    /*     __android_log_print(ANDROID_LOG_INFO, "System", "[exception] can't run"); */
-    /*     /1* ss << endl; *1/ */
-    /*     /1* ss << "!! Failed to run system; got exception. " << std::endl; *1/ */
-    /*     /1* ss << "   Exception was: " << std::endl; *1/ */
-    /*     /1* ss << e.what << std::endl; *1/ */
-    /* } */
-    /* __android_log_print(ANDROID_LOG_INFO, "System", "end"); */
-
 }
 
 
@@ -67,7 +47,6 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_send( JNIEnv* env, jobject thiz, j
 {
     const char* c = env->GetStringUTFChars(command, 0);
     GUI.CallCallbacks("KeyPress", string(c));
-    /* __android_log_print(ANDROID_LOG_INFO, "PTAM", "key pressed"); */
     env->ReleaseStringUTFChars(command, c);
 }
 
@@ -105,15 +84,15 @@ JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getModelView( JNIEnv* env, 
     return ret;
 }
 
-/* JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getViewModel( JNIEnv* env, jobject thiz) */
-/* { */
-/*     System* s = System::get_instance(); */
-/*     float* mat = s->get_viewmodel(); */
-/*     jfloatArray ret = env->NewFloatArray(16); */
-/*     env->SetFloatArrayRegion(ret, 0, 16, mat); */
-/*     delete mat; */
-/*     return ret; */
-/* } */
+JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getCorners( JNIEnv* env, jobject thiz)
+{
+    System* s = System::get_instance();
+    float* array = s->get_corners();
+    jfloatArray ret = env->NewFloatArray(4*12);
+    env->SetFloatArrayRegion(ret, 0, 4*12, array);
+    delete array;
+    return ret;
+}
 
 JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_update( JNIEnv* env, jobject thiz, jbyteArray array )
 {
@@ -130,4 +109,5 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_update( JNIEnv* env, jobject thiz,
     }
     s->update();
 }
+
 }

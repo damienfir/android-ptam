@@ -36,12 +36,7 @@ public class Logger {
 	public void log_beep() {
 		long t = System.currentTimeMillis();
 		String str = "" + t;
-		try {
-			_buf.write(str);
-			_buf.newLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		write_line(str);
 	}
 	
 	public void write(float mv[]) {
@@ -52,6 +47,21 @@ public class Logger {
 			str += " " + f ;
 		}
 		
+		write_line(str);
+	}
+	
+	public void write_mat(float mat[]) {
+		for (int i = 0; i < 3; ++i) {
+			String str = "";
+			for (int j = 0; j < 12; ++j) {
+				str += mat[i*12+j]+" " ;
+			}
+			write_line(str);
+		}
+		flush();
+	}
+	
+	public void write_line(String str) {
 		try {
 			_buf.write(str);
 			_buf.newLine();

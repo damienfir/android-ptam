@@ -36,6 +36,7 @@ public:
 
     float* get_modelview();
     float* get_viewmodel();
+    float* get_corners();
     void set_size(int* size);
     void update_frame(unsigned char* frame, int size);
     void update();
