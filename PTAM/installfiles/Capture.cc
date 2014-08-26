@@ -37,3 +37,14 @@ vector<Vector<3> > Capture::get_rectangle()
 {
     return _corners;
 }
+
+
+void Capture::store_position(SE3<> m)
+{
+    _positions.push_back(m.get_translation());
+}
+
+vector<Vector<3> > Capture::get_positions()
+{
+    return _positions;
+}

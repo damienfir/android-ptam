@@ -22,6 +22,7 @@ public class VideoSource implements Camera.PreviewCallback {
 		Parameters newParam = mCamera.getParameters();
 		newParam.setPreviewSize(640, 480);
 		newParam.setPreviewFormat(ImageFormat.YV12);
+		newParam.setFlashMode(Parameters.FLASH_MODE_TORCH);
 		mCamera.setParameters(newParam);
 		
 		mCamera.setPreviewCallback(this);
@@ -48,7 +49,6 @@ public class VideoSource implements Camera.PreviewCallback {
 			c = Camera.open();
 		} catch (Exception e) {
 			Log.i("PTAM","cannot get camera");
-			// Camera is not available (in use or does not exist)
 		}
 		return c;
 	}
@@ -61,6 +61,7 @@ public class VideoSource implements Camera.PreviewCallback {
 	
 	public void camera_release() {
 		if (mCamera != null) {
+			mCamera.setPreviewCallback(null);
 			mCamera.release();
 			mCamera = null;
 		}

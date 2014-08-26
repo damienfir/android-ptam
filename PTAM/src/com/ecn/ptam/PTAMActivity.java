@@ -20,7 +20,6 @@ public class PTAMActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		_vs = new VideoSource();
-		_viewer = new CaptureViewer(this, _vs);
 
 		// hide system UI
 		View decorView = getWindow().getDecorView();
@@ -32,6 +31,8 @@ public class PTAMActivity extends Activity {
 //		Button btn_reset = new Button(this);
 //		btn_reset.setText("Reset");
 //		btn_reset.setOnClickListener(_view);
+		
+		_viewer = new CaptureViewer(this, _vs);
 
 		Button btn_action = new Button(this);
 		btn_action.setText("Start stereo init");
@@ -40,6 +41,8 @@ public class PTAMActivity extends Activity {
 		LinearLayout layout = new LinearLayout(this);
 //		layout.addView(btn_reset);
 		layout.addView(btn_action);
+		
+		
 		
 		FrameLayout fl = new FrameLayout(this);
 		fl.setForegroundGravity(Gravity.BOTTOM | Gravity.START);

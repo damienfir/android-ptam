@@ -71,15 +71,39 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_send( JNIEnv* env, jobject thiz, j
     env->ReleaseStringUTFChars(command, c);
 }
 
-/* JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getModelView( JNIEnv* env, jobject thiz) */
-/* { */
-/*     System* s = System::get_instance(); */
-/*     float* mat = s->get_modelview(); */
-/*     jfloatArray ret = env->NewFloatArray(16); */
-/*     env->SetFloatArrayRegion(ret, 0, 16, mat); */
-/*     delete mat; */
-/*     return ret; */
-/* } */
+JNIEXPORT jboolean JNICALL Java_com_ecn_ptam_PTAM_mapIsGood( JNIEnv* env, jobject thiz )
+{
+    System* s = System::get_instance();
+    jboolean ret = (jboolean)s->map_is_good();
+}
+
+JNIEXPORT jboolean JNICALL Java_com_ecn_ptam_PTAM_objectIsGood( JNIEnv* env, jobject thiz )
+{
+    System* s = System::get_instance();
+    jboolean ret = (jboolean)s->object_is_good();
+}
+
+JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_start( JNIEnv* env, jobject thiz )
+{
+    System* s = System::get_instance();
+    s->started = true;
+}
+
+JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_stop( JNIEnv* env, jobject thiz )
+{
+    System* s = System::get_instance();
+    s->started = false;
+}
+
+JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getModelView( JNIEnv* env, jobject thiz)
+{
+    System* s = System::get_instance();
+    float* mat = s->get_modelview();
+    jfloatArray ret = env->NewFloatArray(16);
+    env->SetFloatArrayRegion(ret, 0, 16, mat);
+    delete mat;
+    return ret;
+}
 
 /* JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getViewModel( JNIEnv* env, jobject thiz) */
 /* { */

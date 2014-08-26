@@ -40,6 +40,10 @@ public:
     void update_frame(unsigned char* frame, int size);
     void update();
     void store_corner();
+    bool map_is_good();
+    bool object_is_good();
+
+    bool started;
 
 private:
     /* CVD::Image<CVD::Rgb<CVD::byte> > mimFrameRGB; */
@@ -60,6 +64,7 @@ private:
 
     void draw_center();
     void draw_rectangle();
+    void draw_painted();
 
     static void GUICommandCallBack(void* ptr, std::string sCommand, std::string sParams);
 };

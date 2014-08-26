@@ -71,6 +71,7 @@ System::System(int* size)
     _capture = new Capture();
 
     /* mbDone = false; */
+    started = false;
 	__android_log_print(ANDROID_LOG_INFO, "PTAM", "system loaded");
 };
 
@@ -89,6 +90,16 @@ void System::update_frame(unsigned char* frame, int size)
 }
 
 
+bool System::map_is_good()
+{
+    return mpMap->IsGood();
+}
+
+bool System::object_is_good()
+{
+    return _capture->get_rectangle().size() == 4;
+}
+
 void System::update()
 {
     glMatrixMode(GL_PROJECTION);
@@ -101,8 +112,14 @@ void System::update()
 
     glPopMatrix();
 
+    if (started) {
+        _capture->store_position(mpTracker->GetCurrentPose());
+    }
+
     draw_center();
     draw_rectangle();
+    draw_painted();
+
 }
 
 
@@ -120,7 +137,31 @@ void System::draw_center()
 
 void System::draw_painted()
 {
+    std::vector<Vector<3> > prev = _capture->get_positions();
+    if (prev.size() == 0) return;
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glMultMatrix(mpCamera->MakeUFBLinearFrustumMatrix(0.005, 100));
+    glMultMatrix(mpTracker->GetCurrentPose());
     
+    GLfloat* v = new float[prev.size()*3];
+    for (size_t i = 0; i < prev.size(); ++i) {
+        v[i*3] = -(GLfloat)prev[i][0];
+        v[i*3+1] = (GLfloat)prev[i][1];
+        v[i*3+2] = 0.f;
+    }
+    
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glPointSize(10);
+    glColor4f(0,1,0,0.5);
+    glVertexPointer(3, GL_FLOAT, 0, v);
+    glDrawArrays(GL_POINTS, 0, prev.size());
+    glDisableClientState(GL_VERTEX_ARRAY);
+
+    glPopMatrix();
 }
 
 
@@ -138,8 +179,7 @@ void System::draw_rectangle()
     if (rect.size() > 0) {
         if (rect.size() < 3) {
             rect.push_back(mpTracker->GetCurrentPose().get_translation());
-        }
-        else {
+        } else {
             rect.push_back(rect[0]);
         }
 
@@ -169,7 +209,7 @@ float* se3_to_float(SE3<> tform) {
     float* mat = new float[16];
     for (int i = 0; i < 3; ++i)
         for (int j = 0; j < 3; ++j)
-            mat[i*4+j] = (float)rot(j,i); // to column-major matrix
+            mat[i*4+j] = (float)rot(i,j); // to column-major matrix
 
     mat[3] = 0.f;
     mat[7] = 0.f;
@@ -181,12 +221,6 @@ float* se3_to_float(SE3<> tform) {
     mat[14] = (float)trans[2];
 
     return mat;
-}
-
-
-float* System::get_viewmodel() {
-    SE3<> tform = mpTracker->GetCurrentPose().inverse();
-    return se3_to_float(tform);
 }
 
 
