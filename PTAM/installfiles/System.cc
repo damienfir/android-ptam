@@ -119,7 +119,6 @@ void System::update()
     draw_center();
     draw_rectangle();
     draw_painted();
-
 }
 
 

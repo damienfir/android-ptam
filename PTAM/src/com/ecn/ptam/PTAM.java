@@ -3,6 +3,7 @@ package com.ecn.ptam;
 public class PTAM {
 
 	static {
+		System.loadLibrary("gnustl_shared");
 		System.loadLibrary("ptam");
 	}
 	
@@ -14,5 +15,4 @@ public class PTAM {
 	public static native boolean mapIsGood();
 	public static native boolean objectIsGood();
 	public static native float[] getModelView();
-//	public static native float[] getViewModel();
 }

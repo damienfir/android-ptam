@@ -43,7 +43,6 @@ public class PTAMActivity extends Activity {
 		layout.addView(btn_action);
 		
 		
-		
 		FrameLayout fl = new FrameLayout(this);
 		fl.setForegroundGravity(Gravity.BOTTOM | Gravity.START);
 		fl.addView(_viewer);

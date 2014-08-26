@@ -64,7 +64,6 @@ LOCAL_MODULE    := ptam
 LOCAL_LDLIBS +=  -llog -ldl
 LOCAL_LDLIBS    += -landroid -lGLESv1_CM
 LOCAL_SRC_FILES := ptam.cc
-# LOCAL_SRC_FILES += VideoSource_Android.cc
 
 LOCAL_STATIC_LIBRARIES += PTAM
 LOCAL_STATIC_LIBRARIES += cpufeatures
