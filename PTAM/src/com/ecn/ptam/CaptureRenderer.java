@@ -1,11 +1,7 @@
 package com.ecn.ptam;
 
-import static android.opengl.GLES11.*;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import android.util.Log;
 
 
 public class CaptureRenderer extends GLRenderer {

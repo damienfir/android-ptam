@@ -109,22 +109,37 @@ void System::draw_painted()
 
     glMultMatrix(mpCamera->MakeUFBLinearFrustumMatrix(0.005, 100));
     glMultMatrix(mpTracker->GetCurrentPose());
+
+    float z0 = prev[0][2];
+    float factor = 0.f;
     
     GLfloat* v = new float[prev.size()*3];
+    GLfloat* c = new float[prev.size()*4];
     for (size_t i = 0; i < prev.size(); ++i) {
         v[i*3] = -(GLfloat)prev[i][0];
         v[i*3+1] = (GLfloat)prev[i][1];
         v[i*3+2] = 0.f;
+
+        factor = max(min(((float)prev[i][2] - z0) / 0.1f, 1.f), -1.f);
+        c[i*4] = max(-factor, 0.0f);
+        c[i*4+1] = 1-abs(factor);
+        c[i*4+2] = max(factor, 0.0f);
+        c[i*4+3] = 1.f;
     }
     
     glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
     glPointSize(10);
-    glColor4f(0,1,0,0.5);
     glVertexPointer(3, GL_FLOAT, 0, v);
+    glColorPointer(4, GL_FLOAT, 0, c);
     glDrawArrays(GL_POINTS, 0, prev.size());
+    glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
 
     glPopMatrix();
+
+    delete v;
+    delete c;
 }
 
 
@@ -159,6 +174,8 @@ void System::draw_rectangle()
         glVertexPointer(3, GL_FLOAT, 0, rectf);
         glDrawArrays(GL_LINE_STRIP, 0, rect.size());
         glDisableClientState(GL_VERTEX_ARRAY);
+
+        delete rectf;
     }
     
     glPopMatrix();

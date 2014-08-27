@@ -23,14 +23,11 @@ public class PTAMActivity extends Activity {
 
 		// hide system UI
 		View decorView = getWindow().getDecorView();
-		int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+		int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+					  | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 		decorView.setSystemUiVisibility(uiOptions);
 		ActionBar actionBar = getActionBar();
 		actionBar.hide();
-		
-//		Button btn_reset = new Button(this);
-//		btn_reset.setText("Reset");
-//		btn_reset.setOnClickListener(_view);
 		
 		_viewer = new CaptureViewer(this, _vs);
 
@@ -39,9 +36,7 @@ public class PTAMActivity extends Activity {
 		btn_action.setOnClickListener(_viewer);
 		
 		LinearLayout layout = new LinearLayout(this);
-//		layout.addView(btn_reset);
 		layout.addView(btn_action);
-		
 		
 		FrameLayout fl = new FrameLayout(this);
 		fl.setForegroundGravity(Gravity.BOTTOM | Gravity.START);

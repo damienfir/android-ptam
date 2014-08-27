@@ -20,6 +20,7 @@ private:
     std::vector<TooN::Vector<3> > _corners;
     std::vector<TooN::SE3<> > _corners_matrices;
     std::vector<TooN::Vector<3> > _positions;
+    std::vector<TooN::Vector<3> > _rectangle;
 
     void compute_rectangle();
 };

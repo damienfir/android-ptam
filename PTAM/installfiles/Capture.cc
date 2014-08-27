@@ -29,9 +29,12 @@ bool Capture::store_corner(SE3<> c) {
 
 void Capture::compute_rectangle()
 {
+    float factor = 2.f;
     Vector<3> center = _corners[0] +  (_corners[2] - _corners[0])/2.0;
-    Vector<3> v = _corners[1] - center;
-    _corners.push_back(center - v);
+    _rectangle.push_back(center + (_corners[0] - center) * factor);
+    _rectangle.push_back(center + (_corners[1] - center) * factor);
+    _rectangle.push_back(center + (_corners[2] - center) * factor);
+    _rectangle.push_back(center - (_corners[1] - center) * factor);
 }
 
 vector<SE3<> > Capture::get_corners_matrices()
@@ -41,7 +44,12 @@ vector<SE3<> > Capture::get_corners_matrices()
 
 vector<Vector<3> > Capture::get_rectangle()
 {
-    return _corners;
+    if (_rectangle.size() == 0) {
+        return _corners;
+    }
+    else {
+        return _rectangle;
+    }
 }
 
 

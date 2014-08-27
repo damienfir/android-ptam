@@ -412,8 +412,8 @@ int Tracker::TrailTracking_Advance()
         glLineWidth(2);
         glEnable(GL_POINT_SMOOTH);
         glEnable(GL_LINE_SMOOTH);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
+        /* glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
+        /* glEnable(GL_BLEND); */
     }
     GLfloat col[8*mlTrails.size()];
     GLfloat pts[4*mlTrails.size()];
