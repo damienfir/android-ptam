@@ -3,7 +3,12 @@ package com.ecn.ptam;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-
+/*
+ * The draw() and init() methods are called by the BatchRenderer when the GLSurfaceView has to
+ * be redrawn.
+ * Sends a frame from the camera to PTAM to update its tracking state and allows PTAM
+ * to render OpenGL data into the GLSurfaceView.
+ */
 public class CaptureRenderer extends GLRenderer {
 	
 	private VideoSource _vs;

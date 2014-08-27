@@ -8,6 +8,10 @@ import java.io.IOException;
 import android.content.Context;
 import android.os.Environment;
 
+
+/*
+ * Creates the log file and provides an interface to write positions, matrices and timestamp into it
+ */
 public class Logger {
 	
 	private BufferedWriter _buf;

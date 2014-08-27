@@ -16,6 +16,10 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 
 
+/*
+ * Keeps a list of GLRenderers and calls their appropriate methods to initialize and
+ * draw OpenGL content. It allows the separation between rendering the different part of a scene.
+ */
 public class BatchRenderer implements GLSurfaceView.Renderer {
 	
 	private List<GLRenderer> _list;

@@ -15,6 +15,9 @@ using namespace std;
 using namespace GVars3;
 
 
+/*
+ * Singleton pattern to recover the unique instance of the System. Used by the JNI interface.
+ */
 System* System::_instance = NULL;
 System* System::get_instance() { return _instance; }
 
@@ -35,12 +38,17 @@ System::System(int* size)
     mpMap = new Map;
     mpMapMaker = new MapMaker(*mpMap, *mpCamera);
     mpTracker = new Tracker(_imsize, *mpCamera, *mpMap, *mpMapMaker);
+
+    // manages the camera positions data and the rectangle drawn by the user
     _capture = new Capture();
 
     started = false;
 }
 
 
+/*
+ * Updates the frame size
+ */
 void System::set_size(int* size)
 {
     _imsize = CVD::ImageRef(size[0], size[1]);
@@ -48,6 +56,9 @@ void System::set_size(int* size)
 }
 
 
+/*
+ * Updates the current frame
+ */
 void System::update_frame(unsigned char* frame, int size)
 {
     memcpy(mimFrameBW.data(), frame, _imsize[0]*_imsize[1]);
@@ -64,6 +75,10 @@ bool System::object_is_good()
     return _capture->get_rectangle().size() == 4;
 }
 
+/*
+ * Update step of the PTAM algorithm. It tracks the camera position based on the new frame,
+ * and draw some OpenGL content such as image features.
+ */
 void System::update()
 {
     glMatrixMode(GL_PROJECTION);
@@ -76,16 +91,21 @@ void System::update()
 
     glPopMatrix();
 
+    // Store position only if the capture process has begun
     if (started) {
         _capture->store_position(mpTracker->GetCurrentPose());
     }
 
+    // Draw user feedback content
     draw_center();
     draw_rectangle();
     draw_painted();
 }
 
 
+/*
+ * Projects the point where the light is directed to
+ */
 void System::draw_center()
 {
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -98,6 +118,10 @@ void System::draw_center()
 }
 
 
+/*
+ * Draw all the points that has been captured, with color information about the distance of the 
+ * user to the plane
+ */
 void System::draw_painted()
 {
     std::vector<Vector<3> > prev = _capture->get_positions();
@@ -110,8 +134,13 @@ void System::draw_painted()
     glMultMatrix(mpCamera->MakeUFBLinearFrustumMatrix(0.005, 100));
     glMultMatrix(mpTracker->GetCurrentPose());
 
-    float z0 = prev[0][2];
-    float factor = 0.f;
+    float realdepth = 20.f; // Real depth of the light to the object, given by the user.
+    float z0 = prev[0][2]; // Depth at the beginning of the capture process.
+    float precision = 1.f; // Error margin. Here we give the user 1cm of error margin.
+    float ratio = z0/realdepth;
+    float factor; // +1.0 if the user is 1cm to close to the object
+                  // -1.0 if the user is 1cm to far from the object
+                  // 0.0 if the user is on the sampling plane
     
     GLfloat* v = new float[prev.size()*3];
     GLfloat* c = new float[prev.size()*4];
@@ -120,7 +149,7 @@ void System::draw_painted()
         v[i*3+1] = (GLfloat)prev[i][1];
         v[i*3+2] = 0.f;
 
-        factor = max(min(((float)prev[i][2] - z0) / 0.1f, 1.f), -1.f);
+        factor = max(min(((float)prev[i][2] - z0) / (precision * ratio), 1.f), -1.f);
         c[i*4] = max(-factor, 0.0f);
         c[i*4+1] = 1-abs(factor);
         c[i*4+2] = max(factor, 0.0f);
@@ -143,6 +172,9 @@ void System::draw_painted()
 }
 
 
+/*
+ * Draws the rectangle that the user defined, representing the sampling area
+ */
 void System::draw_rectangle()
 {
     glMatrixMode(GL_PROJECTION);
@@ -182,6 +214,9 @@ void System::draw_rectangle()
 }
 
 
+/*
+ * Utility function to convert a matrix to a vector of floats (row-major order)
+ */
 float* se3_to_float(SE3<> tform) {
     Matrix<3,3,double> rot = tform.get_rotation().get_matrix();
     Vector<3,double> trans = tform.get_translation();

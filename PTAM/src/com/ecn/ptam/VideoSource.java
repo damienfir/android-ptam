@@ -8,6 +8,11 @@ import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.util.Log;
 
+
+/*
+ * Manages the camera allocation/deallocation and provides an interface to grab
+ * a frame
+ */
 public class VideoSource implements Camera.PreviewCallback {
 
 	private Camera mCamera;

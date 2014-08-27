@@ -1,4 +1,4 @@
-Log file format:
+# Log file format
 
 lines 1-3:
     corners of the object area

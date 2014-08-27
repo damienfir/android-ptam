@@ -23,8 +23,7 @@ public class PTAMActivity extends Activity {
 
 		// hide system UI
 		View decorView = getWindow().getDecorView();
-		int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
-					  | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+		int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
 		decorView.setSystemUiVisibility(uiOptions);
 		ActionBar actionBar = getActionBar();
 		actionBar.hide();
@@ -56,9 +55,9 @@ public class PTAMActivity extends Activity {
 
 	@Override
 	public void onPause() {
-		super.onPause();
 		_viewer.onPause();
 		_vs.camera_release();
+		super.onPause();
 	}
 
 	

@@ -8,6 +8,12 @@ import android.opengl.GLSurfaceView;
 import android.view.View;
 import android.widget.Button;
 
+/*
+ * Manages the state of the application, calls PTAM to update its state.
+ * Sends KeyPress events to PTAM to simulate a user interaction.
+ * Manages the Logger to save information on the disk.
+ * Emits the beep sound to synchronize the video with the logged positions.
+ */
 public class CaptureViewer extends GLSurfaceView implements View.OnClickListener {
 	
 	private BatchRenderer _renderer;

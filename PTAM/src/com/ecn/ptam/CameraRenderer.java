@@ -8,6 +8,10 @@ import java.nio.IntBuffer;
 
 import android.graphics.SurfaceTexture;
 
+
+/*
+ * Renders the camera frame as an OpenGL texture
+ */
 public class CameraRenderer extends GLRenderer {
 
 	private VideoSource _vs;

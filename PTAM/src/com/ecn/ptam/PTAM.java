@@ -1,5 +1,9 @@
 package com.ecn.ptam;
 
+
+/*
+ * Interface to the native library
+ */
 public class PTAM {
 
 	static {

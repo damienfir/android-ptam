@@ -18,20 +18,15 @@ using namespace GVars3;
 #endif
 
 
-/* return current time in milliseconds */
-static double
-now_ms(void)
-{
-	struct timespec res;
-	clock_gettime(CLOCK_REALTIME, &res);
-	return 1000.0*res.tv_sec + (double)res.tv_nsec/1e6;
-}
 
 extern "C"{
 
 JavaVM* jvm;
 
 
+/*
+ * Initialize the PTAM environment with the size of the frame
+ */
 JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_init( JNIEnv* env, jobject thiz, jintArray size)
 {
     env->GetJavaVM(&jvm);
@@ -43,6 +38,9 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_init( JNIEnv* env, jobject thiz, j
 }
 
 
+/*
+ * Sends keypress events to PTAM to simulate user interaction
+ */
 JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_send( JNIEnv* env, jobject thiz, jstring command )
 {
     const char* c = env->GetStringUTFChars(command, 0);
@@ -50,30 +48,46 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_send( JNIEnv* env, jobject thiz, j
     env->ReleaseStringUTFChars(command, c);
 }
 
+/*
+ * Asks if the map created by PTAM is good and stable
+ */
 JNIEXPORT jboolean JNICALL Java_com_ecn_ptam_PTAM_mapIsGood( JNIEnv* env, jobject thiz )
 {
     System* s = System::get_instance();
     jboolean ret = (jboolean)s->map_is_good();
 }
 
+/*
+ * Asks if the object size has already been defined by the user
+ */
 JNIEXPORT jboolean JNICALL Java_com_ecn_ptam_PTAM_objectIsGood( JNIEnv* env, jobject thiz )
 {
     System* s = System::get_instance();
     jboolean ret = (jboolean)s->object_is_good();
 }
 
+/*
+ * Tells PTAM that the user has begun the capture process
+ */
 JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_start( JNIEnv* env, jobject thiz )
 {
     System* s = System::get_instance();
     s->started = true;
 }
 
+/*
+ * Tells PTAM that the user has stopped the capture process
+ */
 JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_stop( JNIEnv* env, jobject thiz )
 {
     System* s = System::get_instance();
     s->started = false;
 }
 
+/*
+ * Returns the model-view transformation which contains camera position relative to the plane
+ * and its rotation.
+ */
 JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getModelView( JNIEnv* env, jobject thiz)
 {
     System* s = System::get_instance();
@@ -84,6 +98,10 @@ JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getModelView( JNIEnv* env, 
     return ret;
 }
 
+
+/*
+ * Returns the three object corners that the user defined
+ */
 JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getCorners( JNIEnv* env, jobject thiz)
 {
     System* s = System::get_instance();
@@ -94,6 +112,14 @@ JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getCorners( JNIEnv* env, jo
     return ret;
 }
 
+
+/*
+ * Updates PTAM with the camera frame that needs to be included in the tracking process.
+ *
+ * Possible improvement:
+ * Instead of sending the frame as an array, the native code can access the texture that contains the video frame. In this manner
+ * we won't have to copy the frame in memory, only from GPU memory. Not sure if it's faster though.
+ */
 JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_update( JNIEnv* env, jobject thiz, jbyteArray array )
 {
     System* s = System::get_instance();
