@@ -1,0 +1,4 @@
+set solib-search-path /home/ab/epfl/ivrg/src/android/PTAM/PTAM/obj/local/armeabi
+directory /opt/android-ndk/platforms/android-19/arch-arm/usr/include /home/ab/epfl/ivrg/src/android/PTAM/PTAM/jni/../installfiles/ ../ndk-modules/TooN/jni/../include /opt/android-ndk/sources/android/cpufeatures ../ndk-modules/cvd/jni/../installfiles ../ndk-modules/gvars3/jni/../installfiles /opt/android-ndk/sources/cxx-stl/gnu-libstdc++/4.6/include /opt/android-ndk/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/include /opt/android-ndk/sources/cxx-stl/gnu-libstdc++/4.6/include/backward ../ndk-modules/lapack/jni/clapack/BLAS/SRC ../ndk-modules/lapack/jni/clapack/SRC/VARIANTS ../ndk-modules/lapack/jni/clapack/F2CLIBS/libf2c
+file ./obj/local/armeabi/app_process
+target remote :5039

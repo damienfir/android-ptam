@@ -1,0 +1,8 @@
+/home/ab/epfl/ivrg/src/android/PTAM/PTAM/obj/local/armeabi/objs/clapack/cpptri.o: \
+ ../ndk-modules/lapack/jni/clapack/SRC/cpptri.c \
+ ../ndk-modules/lapack/jni/clapack/SRC/f2c.h \
+ ../ndk-modules/lapack/jni/clapack/SRC/blaswrap.h
+
+../ndk-modules/lapack/jni/clapack/SRC/f2c.h:
+
+../ndk-modules/lapack/jni/clapack/SRC/blaswrap.h:
