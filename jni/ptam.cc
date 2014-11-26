@@ -3,8 +3,9 @@
 #include <sstream>
 #include <stdlib.h>
 #include <gvars3/instances.h>
-#include "System.h"
 #include <android/log.h>
+
+#include "PTAM/System.h"
 
 using namespace std;
 using namespace GVars3;
@@ -129,7 +130,7 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_update( JNIEnv* env, jobject thiz,
     if (y != NULL) {
         s->update_frame(y, len);
         env->ReleaseByteArrayElements(array, (jbyte*)y, JNI_ABORT);
-        delete y;
+        /* delete y; */
     } else {
         __android_log_print(ANDROID_LOG_ERROR, "PTAM", "cannot get image");
     }

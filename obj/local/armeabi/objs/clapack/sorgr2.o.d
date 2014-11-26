@@ -1,8 +1,0 @@
-/home/ab/epfl/ivrg/src/android/PTAM/PTAM/obj/local/armeabi/objs/clapack/sorgr2.o: \
- ../ndk-modules/lapack/jni/clapack/SRC/sorgr2.c \
- ../ndk-modules/lapack/jni/clapack/SRC/f2c.h \
- ../ndk-modules/lapack/jni/clapack/SRC/blaswrap.h
-
-../ndk-modules/lapack/jni/clapack/SRC/f2c.h:
-
-../ndk-modules/lapack/jni/clapack/SRC/blaswrap.h:

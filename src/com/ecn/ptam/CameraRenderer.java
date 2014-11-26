@@ -1,12 +1,20 @@
 package com.ecn.ptam;
 
+import static android.opengl.GLES10.GL_COLOR_BUFFER_BIT;
+import static android.opengl.GLES10.glClear;
+import static android.opengl.GLES10.glClearColor;
+import static android.opengl.GLES10.glViewport;
 import static android.opengl.GLES11.*;
 import static android.opengl.GLES11Ext.GL_TEXTURE_EXTERNAL_OES;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
 import android.graphics.SurfaceTexture;
+import android.opengl.GLSurfaceView;
 
 
 /*
@@ -18,8 +26,7 @@ public class CameraRenderer extends GLRenderer {
 	private SurfaceTexture _tex;
 	private IntBuffer _id;
 	private IntBuffer _tex_id;
-	
-	
+		
 	public CameraRenderer(VideoSource vs) {
 		_vs = vs;
 	}
@@ -46,7 +53,7 @@ public class CameraRenderer extends GLRenderer {
 		glDisable(GL_TEXTURE_EXTERNAL_OES);
 	}
 	
-	public void changed() {
+	public void changed(int width, int height) {
 		_vs.set_texture(_tex);
 	}
 	

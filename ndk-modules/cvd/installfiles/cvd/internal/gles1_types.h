@@ -30,6 +30,7 @@
 #include <cvd/rgb8.h>
 #include <cvd/rgba.h>
 #include <cvd/la.h>
+#include <GLES/gl.h>
 
 namespace CVD
 {

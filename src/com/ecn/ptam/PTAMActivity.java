@@ -12,14 +12,12 @@ import android.widget.LinearLayout;
 
 public class PTAMActivity extends Activity {
 
-	private VideoSource _vs;
-	private CaptureViewer _viewer;
-	
+	private VideoSource _videosource;
+	private CaptureViewer _capture;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		_vs = new VideoSource();
 
 		// hide system UI
 		View decorView = getWindow().getDecorView();
@@ -27,45 +25,72 @@ public class PTAMActivity extends Activity {
 		decorView.setSystemUiVisibility(uiOptions);
 		ActionBar actionBar = getActionBar();
 		actionBar.hide();
-		
-		_viewer = new CaptureViewer(this, _vs);
+
+		_videosource = new VideoSource();
+		_capture = new CaptureViewer(this, _videosource);
 
 		Button btn_action = new Button(this);
-		btn_action.setText("Start stereo init");
-		btn_action.setOnClickListener(_viewer);
-		
-		LinearLayout layout = new LinearLayout(this);
-		layout.addView(btn_action);
-		
-		FrameLayout fl = new FrameLayout(this);
-		fl.setForegroundGravity(Gravity.BOTTOM | Gravity.START);
-		fl.addView(_viewer);
-		fl.addView(layout);
-		
-		setContentView(fl);
+		btn_action.setOnClickListener(_capture);
+		_capture.set_action_button(btn_action);
+		_capture.reset_all();
+
+		Button btn_reset_all = new Button(this);
+		btn_reset_all.setText("Reset");
+		btn_reset_all.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				_capture.reset_all();
+			}
+		});
+
+		Button btn_reset_zone = new Button(this);
+		btn_reset_zone.setText("Reset Zone");
+		btn_reset_zone.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				_capture.reset_zone();
+			}
+		});
+
+		Button btn_reset_tracking = new Button(this);
+		btn_reset_tracking.setText("Reset Tracking");
+		btn_reset_tracking.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				_capture.reset_tracking();
+			}
+		});
+
+		LinearLayout llayout = new LinearLayout(this);
+		llayout.addView(btn_reset_all);
+		llayout.addView(btn_reset_zone);
+		llayout.addView(btn_reset_tracking);
+		llayout.addView(btn_action);
+
+		FrameLayout flayout = new FrameLayout(this);
+		flayout.addView(_capture);
+		flayout.addView(llayout);
+
+		setContentView(flayout);
 	}
-	
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
-		_viewer.onResume();
+		_capture.onResume();
 	}
-
 
 	@Override
 	public void onPause() {
-		_viewer.onPause();
-		_vs.camera_release();
+		_capture.onPause();
+		_videosource.camera_release();
 		super.onPause();
 	}
 
-	
 	@Override
 	public void onStop() {
 		super.onStop();
 	}
-
 
 	@Override
 	public void onDestroy() {

@@ -17,31 +17,31 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_CPP_EXTENSION := .cc
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/../installfiles/
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/PTAM/
 LOCAL_MODULE    := PTAM
 
-LOCAL_SRC_FILES += ../installfiles/ARDriver.cc                      \
-				   ../installfiles/ATANCamera.cc                       \
-				   ../installfiles/Bundle.cc                       \
-				   ../installfiles/CalibCornerPatch.cc                      \
-				   ../installfiles/Capture.cc                      \
-				   ../installfiles/CalibImage.cc                      \
-				   ../installfiles/EyeGame.cc                      \
-				   ../installfiles/GLWindowMenu.cc                      \
-				   ../installfiles/HomographyInit.cc                      \
-				   ../installfiles/KeyFrame.cc                      \
-				   ../installfiles/Map.cc                      \
-				   ../installfiles/MapMaker.cc                      \
-				   ../installfiles/MapPoint.cc                      \
-				   ../installfiles/MapViewer.cc                      \
-				   ../installfiles/MiniPatch.cc                      \
-				   ../installfiles/PatchFinder.cc                      \
-				   ../installfiles/Relocaliser.cc                      \
-				   ../installfiles/ShiTomasi.cc                      \
-				   ../installfiles/SmallBlurryImage.cc                      \
-				   ../installfiles/System.cc                      \
-				   ../installfiles/Tracker.cc                      \
-				   # ../installfiles/CameraCalibrator.cc                      \
+LOCAL_SRC_FILES += PTAM/ARDriver.cc                      \
+				   PTAM/ATANCamera.cc                       \
+				   PTAM/Bundle.cc                       \
+				   PTAM/CalibCornerPatch.cc                      \
+				   PTAM/Capture.cc                      \
+				   PTAM/CalibImage.cc                      \
+				   PTAM/EyeGame.cc                      \
+				   PTAM/GLWindowMenu.cc                      \
+				   PTAM/HomographyInit.cc                      \
+				   PTAM/KeyFrame.cc                      \
+				   PTAM/Map.cc                      \
+				   PTAM/MapMaker.cc                      \
+				   PTAM/MapPoint.cc                      \
+				   PTAM/MapViewer.cc                      \
+				   PTAM/MiniPatch.cc                      \
+				   PTAM/PatchFinder.cc                      \
+				   PTAM/Relocaliser.cc                      \
+				   PTAM/ShiTomasi.cc                      \
+				   PTAM/SmallBlurryImage.cc                      \
+				   PTAM/System.cc                      \
+				   PTAM/Tracker.cc                      \
+				   # PTAM/CameraCalibrator.cc                      \
 
 LOCAL_STATIC_LIBRARIES += TooN
 LOCAL_STATIC_LIBRARIES += cpufeatures
@@ -62,7 +62,7 @@ LOCAL_CPP_EXTENSION := .cc
 LOCAL_MODULE    := ptam
 
 LOCAL_LDLIBS +=  -llog -ldl
-LOCAL_LDLIBS    += -landroid -lGLESv1_CM
+LOCAL_LDLIBS    += -landroid -lGLESv1_CM -lGLESv2
 LOCAL_SRC_FILES := ptam.cc
 
 LOCAL_STATIC_LIBRARIES += PTAM
@@ -70,7 +70,7 @@ LOCAL_STATIC_LIBRARIES += cpufeatures
 
 include $(BUILD_SHARED_LIBRARY)
 $(call import-module,android/cpufeatures)
-$(call import-add-path,../ndk-modules)
+$(call import-add-path,ndk-modules)
 $(call import-module,cvd)
 $(call import-module,gvars3)
 $(call import-module,TooN)

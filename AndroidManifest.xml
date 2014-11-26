@@ -13,7 +13,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:screenOrientation="landscape">
-        <activity android:name=".PTAMActivity"
+        <activity android:name="PTAMActivity"
                   android:label="@string/app_name"
                   android:screenOrientation="landscape">
             <intent-filter>

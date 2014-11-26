@@ -51,7 +51,7 @@ public class BatchRenderer implements GLSurfaceView.Renderer {
 		glViewport(0, 0, width, height);
 		
 		for (GLRenderer r : _list) {
-			r.changed();
+			r.changed(width, height);
 		}
 	}
 
