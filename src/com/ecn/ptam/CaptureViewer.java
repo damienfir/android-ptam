@@ -35,14 +35,12 @@ public class CaptureViewer extends GLSurfaceView implements
 		super(context);
 
 		_state = State.INIT;
-		_logger = new Logger(context, "positions.log");
+		_logger = new Logger(context, "light.log");
 		load_beep(context);
 
-		CaptureRenderer capture = new CaptureRenderer(videosource, this);
-		CameraRenderer camera = new CameraRenderer(videosource);
 		_renderer = new BatchRenderer();
-		_renderer.add(camera);
-		_renderer.add(capture);
+		_renderer.add(new CameraRenderer(videosource));
+		_renderer.add(new CaptureRenderer(videosource, this));
 		setRenderer(_renderer);
 
 		_buttonmap = new HashMap<State, String>();
@@ -70,7 +68,7 @@ public class CaptureViewer extends GLSurfaceView implements
 
 	public void update() {
 		if (_state == State.TRACKING) {
-			_logger.write(PTAM.getModelView());
+			_logger.write(PTAM.getTime(), PTAM.getModelView());
 		}
 	}
 
@@ -107,14 +105,14 @@ public class CaptureViewer extends GLSurfaceView implements
 	private void zone_handler() {
 		PTAM.send("Enter");
 		if (PTAM.objectIsGood()) {
-			_logger.write_mat(PTAM.getCorners());
+			_logger.write_corners(PTAM.getCorners());
 			change_state(State.STANDBY);
 		}
 	}
 
 	public void standby_handler() {
 		_player.start();
-		_logger.log_beep();
+		_logger.log_beep(PTAM.getTime());
 		PTAM.start();
 		change_state(State.TRACKING);
 	}

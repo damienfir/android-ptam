@@ -100,6 +100,13 @@ JNIEXPORT jfloatArray JNICALL Java_com_ecn_ptam_PTAM_getModelView( JNIEnv* env, 
 }
 
 
+JNIEXPORT jlong JNICALL Java_com_ecn_ptam_PTAM_getTime( JNIEnv* env, jobject thiz)
+{
+    System* s = System::get_instance();
+    return (jlong)s->time;
+}
+
+
 /*
  * Returns the three object corners that the user defined
  */

@@ -47,6 +47,7 @@ public:
     void reset_stereo();
 
     bool started;
+    long time;
 
 private:
     /* CVD::Image<CVD::Rgb<CVD::byte> > mimFrameRGB; */
@@ -68,6 +69,7 @@ private:
     void draw_center();
     void draw_rectangle();
     void draw_painted();
+    void store_time();
 
     static void GUICommandCallBack(void* ptr, std::string sCommand, std::string sParams);
 };

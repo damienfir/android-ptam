@@ -2,10 +2,10 @@ package com.ecn.ptam;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -14,14 +14,16 @@ public class PTAMActivity extends Activity {
 
 	private VideoSource _videosource;
 	private CaptureViewer _capture;
+	private PTAMActivity _self;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		_self = this;
 
 		// hide system UI
 		View decorView = getWindow().getDecorView();
-		int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+		int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
 		decorView.setSystemUiVisibility(uiOptions);
 		ActionBar actionBar = getActionBar();
 		actionBar.hide();
@@ -31,6 +33,8 @@ public class PTAMActivity extends Activity {
 
 		Button btn_action = new Button(this);
 		btn_action.setOnClickListener(_capture);
+		LayoutParams params = new LayoutParams(btn_action.getMinWidth(), btn_action.getMinHeight(), (float)2.0);
+		btn_action.setLayoutParams(params);
 		_capture.set_action_button(btn_action);
 		_capture.reset_all();
 
@@ -60,8 +64,20 @@ public class PTAMActivity extends Activity {
 				_capture.reset_tracking();
 			}
 		});
+		
+		Button btn_quit = new Button(this);
+		btn_quit.setText("Quit");
+		btn_quit.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				_self.finish();
+			}
+		});
 
 		LinearLayout llayout = new LinearLayout(this);
+		llayout.setGravity(Gravity.BOTTOM);
+		llayout.setHorizontalGravity(Gravity.END);
+		llayout.addView(btn_quit);
 		llayout.addView(btn_reset_all);
 		llayout.addView(btn_reset_zone);
 		llayout.addView(btn_reset_tracking);

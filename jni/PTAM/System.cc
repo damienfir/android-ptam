@@ -3,6 +3,7 @@
 #include <gvars3/instances.h>
 #include <stdlib.h>
 #include <android/log.h>
+#include <chrono>
 
 #include "../PTAM/ARDriver.h"
 #include "../PTAM/ATANCamera.h"
@@ -88,9 +89,8 @@ void System::update()
     glLoadIdentity();
     glOrthof(-0.5,(double)_imsize.x - 0.5, (double) _imsize.y - 0.5, -0.5, -1.0, 1.0);
 
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "before trackframe");
+    store_time();
     mpTracker->TrackFrame(mimFrameBW, true); // !bDrawAR && !bDrawMap);
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "after trackframe");
 
     glPopMatrix();
 
@@ -103,7 +103,13 @@ void System::update()
     draw_center();
     draw_rectangle();
     draw_painted();
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "updated");
+}
+
+
+void System::store_time()
+{
+    auto timestamp = chrono::high_resolution_clock::now().time_since_epoch();
+    time = chrono::duration_cast<chrono::milliseconds>(timestamp).count();
 }
 
 
@@ -112,10 +118,9 @@ void System::update()
  */
 void System::draw_center()
 {
-    __android_log_print(ANDROID_LOG_INFO, "PTAM", "drawing center");
     glEnableClientState(GL_VERTEX_ARRAY);
     glPointSize(20);
-    glColor4f(1,0,0,1);
+    glColor4f(0,1,0,1);
     float v[] = {0,0};
     glVertexPointer(2, GL_FLOAT, 0, v);
     glDrawArrays(GL_POINTS, 0, 1);
@@ -220,7 +225,7 @@ void System::draw_rectangle()
 
 
 /*
- * Utility function to convert a matrix to a vector of floats (row-major order)
+ * Utility function to convert a matrix to a vector of floats (column-major order)
  */
 float* se3_to_float(SE3<> tform) {
     Matrix<3,3,double> rot = tform.get_rotation().get_matrix();
@@ -229,7 +234,7 @@ float* se3_to_float(SE3<> tform) {
     float* mat = new float[16];
     for (int i = 0; i < 3; ++i)
         for (int j = 0; j < 3; ++j)
-            mat[i*4+j] = (float)rot(i,j); // to column-major matrix
+            mat[i*4+j] = (float)rot(j,i); // to column-major matrix
 
     mat[3] = 0.f;
     mat[7] = 0.f;
@@ -247,11 +252,11 @@ float* se3_to_float(SE3<> tform) {
 float* System::get_corners()
 {
     std::vector<SE3<> > corners = _capture->get_corners_matrices();
-    float* ret = new float[12*4];
-    for (size_t i = 0; i < corners.size(); ++i) {
+    float* ret = new float[16*3];
+    for (size_t i = 0; i < 3; ++i) {
         float* mat = se3_to_float(corners[i]);
-        for (int j = 0; j < 12; ++j) {
-            ret[i*12+j] = mat[j];
+        for (int j = 0; j < 16; ++j) {
+            ret[i*16+j] = mat[j];
         }
     }
     return ret;
@@ -274,7 +279,7 @@ void System::store_corner()
 
 void System::reset_stereo()
 {
-//	mpTracker->Reset();
+	mpTracker->Reset();
 	reset_corners();
 }
 

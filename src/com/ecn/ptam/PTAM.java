@@ -20,4 +20,5 @@ public class PTAM {
 	public static native boolean objectIsGood();
 	public static native float[] getModelView();
 	public static native float[] getCorners();
+	public static native long getTime();
 }
