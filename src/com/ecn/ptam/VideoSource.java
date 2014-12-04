@@ -28,6 +28,8 @@ public class VideoSource implements Camera.PreviewCallback {
 		newParam.setPreviewSize(640, 480);
 		newParam.setPreviewFormat(ImageFormat.YV12);
 		newParam.setFlashMode(Parameters.FLASH_MODE_TORCH);
+		newParam.setFocusMode(Parameters.FOCUS_MODE_INFINITY);
+		
 		mCamera.setParameters(newParam);
 		mCamera.setPreviewCallback(this);
 	}

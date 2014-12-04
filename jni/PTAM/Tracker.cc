@@ -407,7 +407,7 @@ void Tracker::TrailTracking_Start()
 int Tracker::TrailTracking_Advance()
 {
     int nGoodTrails = 0;
-    if(mbDraw)
+    if(true || mbDraw)
     {
         glPointSize(5);
         glLineWidth(2);
@@ -444,7 +444,7 @@ int Tracker::TrailTracking_Advance()
             trail.irCurrentPos = irEnd;
             nGoodTrails++;
         }
-        if(mbDraw)
+        if(true || mbDraw)
         {
             if(!bFound) {
                 col[4*count+1] = 1.0f;
@@ -473,7 +473,7 @@ int Tracker::TrailTracking_Advance()
         }
         i = next;
     }
-    if(mbDraw) {
+    if(true || mbDraw) {
 
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);

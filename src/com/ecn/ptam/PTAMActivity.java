@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -23,7 +24,7 @@ public class PTAMActivity extends Activity {
 
 		// hide system UI
 		View decorView = getWindow().getDecorView();
-		int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+		int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
 		decorView.setSystemUiVisibility(uiOptions);
 		ActionBar actionBar = getActionBar();
 		actionBar.hide();
@@ -75,7 +76,7 @@ public class PTAMActivity extends Activity {
 		});
 
 		LinearLayout llayout = new LinearLayout(this);
-		llayout.setGravity(Gravity.BOTTOM);
+		llayout.setGravity(Gravity.TOP);
 		llayout.setHorizontalGravity(Gravity.END);
 		llayout.addView(btn_quit);
 		llayout.addView(btn_reset_all);
@@ -88,8 +89,9 @@ public class PTAMActivity extends Activity {
 		flayout.addView(llayout);
 
 		setContentView(flayout);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
-
+	
 	@Override
 	public void onResume() {
 		super.onResume();

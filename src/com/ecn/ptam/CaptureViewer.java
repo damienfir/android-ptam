@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -21,7 +24,10 @@ public class CaptureViewer extends GLSurfaceView implements
 
 	private BatchRenderer _renderer;
 	private Logger _logger;
-	private MediaPlayer _player;
+	private SoundPool _sp;
+	private int _beep_id;
+	private Context _ctx;
+	private boolean _beeped;
 
 	private enum State {
 		INIT, STEREO, ZONE, STANDBY, TRACKING
@@ -33,14 +39,15 @@ public class CaptureViewer extends GLSurfaceView implements
 
 	public CaptureViewer(Context context, VideoSource videosource) {
 		super(context);
+		_ctx = context;
 
 		_state = State.INIT;
 		_logger = new Logger(context, "light.log");
 		load_beep(context);
 
 		_renderer = new BatchRenderer();
-		_renderer.add(new CameraRenderer(videosource));
-		_renderer.add(new CaptureRenderer(videosource, this));
+//		_renderer.add(new CameraRenderer(videosource));
+//		_renderer.add(new CaptureRenderer(videosource, this));
 		setRenderer(_renderer);
 
 		_buttonmap = new HashMap<State, String>();
@@ -56,19 +63,24 @@ public class CaptureViewer extends GLSurfaceView implements
 	}
 
 	public void load_beep(Context ctx) {
-		_player = MediaPlayer.create(ctx, R.raw.beep);
-		try {
-			_player.prepare();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		_sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+		_beep_id = _sp.load(ctx, R.raw.beep, 1);
+		_beeped = false;
+	}
+	
+	public void play_beep() {
+		if (_beeped) return;
+		AudioManager audioManager = (AudioManager) _ctx.getSystemService(Context.AUDIO_SERVICE);
+		float maxVolume = (float) audioManager
+				.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		_sp.play(_beep_id, maxVolume, maxVolume, 1, 0, 1f);
+		_logger.log_beep(System.currentTimeMillis());
+		_beeped = true;
 	}
 
 	public void update() {
 		if (_state == State.TRACKING) {
-			_logger.write(PTAM.getTime(), PTAM.getModelView());
+			_logger.write(PTAM.getTime(), PTAM.getModelView(), PTAM.mapIsGood());
 		}
 	}
 
@@ -111,8 +123,7 @@ public class CaptureViewer extends GLSurfaceView implements
 	}
 
 	public void standby_handler() {
-		_player.start();
-		_logger.log_beep(PTAM.getTime());
+		play_beep();
 		PTAM.start();
 		change_state(State.TRACKING);
 	}
@@ -149,5 +160,6 @@ public class CaptureViewer extends GLSurfaceView implements
 	public void onPause() {
 		_logger.flush();
 		_logger.close();
+//		_player.release();
 	}
 }

@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 
 /*
@@ -53,15 +54,16 @@ public class Logger {
 	public void log_beep(long t) {
 		float[] mat = new float[16];
 		Arrays.fill(mat, 0);
-		write(t, mat);
+		write(t, mat, true);
 	}
 	
-	public void write(long time, float mv[]) {
+	public void write(long time, float mv[], boolean is_good) {
+		Log.i("PTAM", ""+time);
 		String str = "" + time;
 		for (float f : mv) {
 			str += " " + f ;
 		}
-		
+		str += " " + (is_good?1.f:0.f);
 		write_line(str);
 	}
 	

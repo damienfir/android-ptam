@@ -7,25 +7,34 @@
 #include <vector>
 
 #include "../PTAM/CalibImage.h"
-#include "../PTAM/GLWindow2.h"
-#include "../PTAM/VideoSource.h"
+/* #include "../PTAM/GLWindow2.h" */
+/* #include "../PTAM/VideoSource.h" */
+
 
 class CameraCalibrator
 {
 public:
-  CameraCalibrator();
-  void Run();
+    static CameraCalibrator* get_instance();
+    static CameraCalibrator* _instance;
+
+  CameraCalibrator(int* size);
+  void update(unsigned char* frame, int size);
+  void set_size(int* size);
   
 protected:
   void Reset();
   void HandleFrame(CVD::Image<CVD::byte> imFrame);
   static void MainLoopCallback(void* pvUserData);
   void MainLoopStep();
-  VideoSource mVideoSource;
+  /* VideoSource mVideoSource; */
   
-  GLWindow2 mGLWindow;
+  /* GLWindow2 mGLWindow; */
   ATANCamera mCamera;
   bool mbDone;
+
+  CVD::ImageRef _imsize;
+
+    CVD::Image<CVD::byte> imFrameBW;
 
   std::vector<CalibImage> mvCalibImgs;
   void OptimizeOneStep();

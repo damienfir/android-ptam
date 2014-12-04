@@ -6,6 +6,7 @@
 #include <android/log.h>
 
 #include "PTAM/System.h"
+/* #include "PTAM/CameraCalibrator.h" */
 
 using namespace std;
 using namespace GVars3;
@@ -32,6 +33,8 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_init( JNIEnv* env, jobject thiz, j
 {
     env->GetJavaVM(&jvm);
     jvm->AttachCurrentThread(&env, NULL);
+
+    GUI.LoadFile("/storage/emulated/legacy/settings.cfg");
 
     jint* imsize = env->GetIntArrayElements(size, 0);
     new System(imsize);
@@ -143,5 +146,44 @@ JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_update( JNIEnv* env, jobject thiz,
     }
     s->update();
 }
+
+
+/* JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_initcalib( JNIEnv* env, jobject thiz, jintArray size) */
+/* { */
+/*     env->GetJavaVM(&jvm); */
+/*     jvm->AttachCurrentThread(&env, NULL); */
+
+/*     GUI.LoadFile("calibrator_settings.cfg"); */
+
+/*     GV3::get<Vector<NUMTRACKERCAMPARAMETERS> >("Camera.Parameters", ATANCamera::mvDefaultParams, SILENT); */
+
+/*     jint* imsize = env->GetIntArrayElements(size, 0); */
+/*     new CameraCalibrator(imsize); */
+/*     delete imsize; */
+/* } */
+
+
+/* JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_sendcalib( JNIEnv* env, jobject thiz, jstring command ) */
+/* { */
+/*     const char* c = env->GetStringUTFChars(command, 0); */
+/*     GUI.CallCallbacks(string(c), ""); */
+/*     env->ReleaseStringUTFChars(command, c); */
+/* } */
+
+
+/* JNIEXPORT void JNICALL Java_com_ecn_ptam_PTAM_updatecalib( JNIEnv* env, jobject thiz, jbyteArray array ) */
+/* { */
+/*     CameraCalibrator* s = CameraCalibrator::get_instance(); */
+
+/*     int len = env->GetArrayLength(array); */
+/*     unsigned char * y = (unsigned char *) env->GetByteArrayElements(array, 0); */
+/*     if (y != NULL) { */
+/*         s->update(y, len); */
+/*         env->ReleaseByteArrayElements(array, (jbyte*)y, JNI_ABORT); */
+/*         /1* delete y; *1/ */
+/*     } else { */
+/*         __android_log_print(ANDROID_LOG_ERROR, "PTAM", "cannot get image"); */
+/*     } */
+/* } */
 
 }

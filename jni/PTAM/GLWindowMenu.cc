@@ -303,24 +303,24 @@ bool GLWindowMenu::HandleClick(int nMouseButton, int state, int x, int y)
       break;
     case Slider:
       {
-	if(nMouseButton == GLWindow::BUTTON_WHEEL_UP)
-	  {
-	    *(SelectedItem.gvnIntValue)+=1;
-	    if(*(SelectedItem.gvnIntValue) > SelectedItem.max)
-	      *(SelectedItem.gvnIntValue) = SelectedItem.max;
-	  }
-	else if(nMouseButton == GLWindow::BUTTON_WHEEL_DOWN)
-	  {
-	    *(SelectedItem.gvnIntValue)-=1;
-	    if(*(SelectedItem.gvnIntValue) < SelectedItem.min)
-	      *(SelectedItem.gvnIntValue) = SelectedItem.min;
-	  }
-	else
-	  {
+	/* if(nMouseButton == GLWindow::BUTTON_WHEEL_UP) */
+	/*   { */
+	/*     *(SelectedItem.gvnIntValue)+=1; */
+	/*     if(*(SelectedItem.gvnIntValue) > SelectedItem.max) */
+	/*       *(SelectedItem.gvnIntValue) = SelectedItem.max; */
+	/*   } */
+	/* else if(nMouseButton == GLWindow::BUTTON_WHEEL_DOWN) */
+	/*   { */
+	/*     *(SelectedItem.gvnIntValue)-=1; */
+	/*     if(*(SelectedItem.gvnIntValue) < SelectedItem.min) */
+	/*       *(SelectedItem.gvnIntValue) = SelectedItem.min; */
+	/*   } */
+	/* else */
+	/*   { */
 	    int nPos = *mgvnMenuItemWidth - ((mnWidth - x) % *mgvnMenuItemWidth);
 	    double dFrac = (double) nPos / *mgvnMenuItemWidth;
 	    *(SelectedItem.gvnIntValue) = (int)(dFrac * (1.0 + SelectedItem.max - SelectedItem.min)) + SelectedItem.min;
-	  };
+	  /* }; */
       }
       break;
     case Monitor:

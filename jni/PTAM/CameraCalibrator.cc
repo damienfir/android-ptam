@@ -4,6 +4,7 @@
 #include <TooN/SVD.h>
 #include <fstream>
 #include <stdlib.h>
+#include <android/log.h>
 
 #include "../PTAM/OpenGL.h"
 
@@ -11,40 +12,44 @@ using namespace CVD;
 using namespace std;
 using namespace GVars3;
 
-int main()
-{
-  cout << "  Welcome to CameraCalibrator " << endl;
-  cout << "  -------------------------------------- " << endl;
-  cout << "  Parallel tracking and mapping for Small AR workspaces" << endl;
-  cout << "  Copyright (C) Isis Innovation Limited 2008 " << endl;
-  cout << endl;  
-  cout << "  Parsing calibrator_settings.cfg ...." << endl;
+/* int main() */
+/* { */
+/*   /1* cout << "  Welcome to CameraCalibrator " << endl; *1/ */
+/*   /1* cout << "  -------------------------------------- " << endl; *1/ */
+/*   /1* cout << "  Parallel tracking and mapping for Small AR workspaces" << endl; *1/ */
+/*   /1* cout << "  Copyright (C) Isis Innovation Limited 2008 " << endl; *1/ */
+/*   /1* cout << endl; *1/ */  
+/*   /1* cout << "  Parsing calibrator_settings.cfg ...." << endl; *1/ */
   
-  GUI.LoadFile("calibrator_settings.cfg");
+/*   GUI.LoadFile("calibrator_settings.cfg"); */
 
-  GUI.StartParserThread();
-  atexit(GUI.StopParserThread); // Clean up readline when program quits
+/*   GUI.StartParserThread(); */
+/*   atexit(GUI.StopParserThread); // Clean up readline when program quits */
   
-  GV3::get<Vector<NUMTRACKERCAMPARAMETERS> >("Camera.Parameters", ATANCamera::mvDefaultParams, SILENT);
+/*   GV3::get<Vector<NUMTRACKERCAMPARAMETERS> >("Camera.Parameters", ATANCamera::mvDefaultParams, SILENT); */
 
-  try
-    {
-      CameraCalibrator c;
-      c.Run();
-    }
-  catch(CVD::Exceptions::All e)
-    {
-      cout << endl;
-      cout << "!! Failed to run CameraCalibrator; got exception. " << endl;
-      cout << "   Exception was: " << endl;
-      cout << e.what << endl;
-    }
-}
+/*   try */
+/*     { */
+/*       CameraCalibrator c; */
+/*       /1* c.Run(); *1/ */
+/*     } */
+/*   catch(CVD::Exceptions::All e) */
+/*     { */
+/*       cout << endl; */
+/*       cout << "!! Failed to run CameraCalibrator; got exception. " << endl; */
+/*       cout << "   Exception was: " << endl; */
+/*       cout << e.what << endl; */
+/*     } */
+/* } */
 
 
+CameraCalibrator* CameraCalibrator::_instance = NULL;
+CameraCalibrator* CameraCalibrator::get_instance() { return _instance; }
 
-CameraCalibrator::CameraCalibrator()
-  :mGLWindow(mVideoSource.Size(), "Camera Calibrator"), mCamera("Camera")
+
+CameraCalibrator::CameraCalibrator(int* size)
+  :mCamera("Camera")
+    //, mGLWindow(CVD::ImageRef(size[0], size[1]), "title")
 {
   mbDone = false;
   GUI.RegisterCommand("CameraCalibrator.GrabNextFrame", GUICommandCallBack, this);
@@ -56,38 +61,51 @@ CameraCalibrator::CameraCalibrator()
   GV3::Register(mgvnOptimizing, "CameraCalibrator.Optimize", 0, SILENT);
   GV3::Register(mgvnShowImage, "CameraCalibrator.Show", 0, SILENT);
   GV3::Register(mgvnDisableDistortion, "CameraCalibrator.NoDistortion", 0, SILENT);
-  GUI.ParseLine("GLWindow.AddMenu CalibMenu");
-  GUI.ParseLine("CalibMenu.AddMenuButton Live GrabFrame CameraCalibrator.GrabNextFrame");
-  GUI.ParseLine("CalibMenu.AddMenuButton Live Reset CameraCalibrator.Reset");
-  GUI.ParseLine("CalibMenu.AddMenuButton Live Optimize \"CameraCalibrator.Optimize=1\"");
-  GUI.ParseLine("CalibMenu.AddMenuToggle Live NoDist CameraCalibrator.NoDistortion");
-  GUI.ParseLine("CalibMenu.AddMenuSlider Opti \"Show Img\" CameraCalibrator.Show 0 10");
-  GUI.ParseLine("CalibMenu.AddMenuButton Opti \"Show Next\" CameraCalibrator.ShowNext");
-  GUI.ParseLine("CalibMenu.AddMenuButton Opti \"Grab More\" CameraCalibrator.Optimize=0 ");
-  GUI.ParseLine("CalibMenu.AddMenuButton Opti Reset CameraCalibrator.Reset");
-  GUI.ParseLine("CalibMenu.AddMenuToggle Opti NoDist CameraCalibrator.NoDistortion");
-  GUI.ParseLine("CalibMenu.AddMenuButton Opti Save CameraCalibrator.SaveCalib");
+  /* GUI.ParseLine("GLWindow.AddMenu CalibMenu"); */
+  /* GUI.ParseLine("CalibMenu.AddMenuButton Live GrabFrame CameraCalibrator.GrabNextFrame"); */
+  /* GUI.ParseLine("CalibMenu.AddMenuButton Live Reset CameraCalibrator.Reset"); */
+  /* GUI.ParseLine("CalibMenu.AddMenuButton Live Optimize \"CameraCalibrator.Optimize=1\""); */
+  /* GUI.ParseLine("CalibMenu.AddMenuToggle Live NoDist CameraCalibrator.NoDistortion"); */
+  /* GUI.ParseLine("CalibMenu.AddMenuSlider Opti \"Show Img\" CameraCalibrator.Show 0 10"); */
+  /* GUI.ParseLine("CalibMenu.AddMenuButton Opti \"Show Next\" CameraCalibrator.ShowNext"); */
+  /* GUI.ParseLine("CalibMenu.AddMenuButton Opti \"Grab More\" CameraCalibrator.Optimize=0 "); */
+  /* GUI.ParseLine("CalibMenu.AddMenuButton Opti Reset CameraCalibrator.Reset"); */
+  /* GUI.ParseLine("CalibMenu.AddMenuToggle Opti NoDist CameraCalibrator.NoDistortion"); */
+  /* GUI.ParseLine("CalibMenu.AddMenuButton Opti Save CameraCalibrator.SaveCalib"); */
+  set_size(size);
   Reset();
 }
 
-void CameraCalibrator::Run()
+
+void CameraCalibrator::set_size(int* size)
 {
-  while(!mbDone)
-    {
+    _imsize = CVD::ImageRef(size[0], size[1]);
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "size: %d", size[0]*size[1]);
+    imFrameBW.resize(_imsize);
+}
+
+
+void CameraCalibrator::update(unsigned char* frame, int size)
+{
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "updating, size %d...", _imsize[0]*_imsize[1]);
+    memcpy(imFrameBW.data(), frame, _imsize[0]*_imsize[1]);
+    __android_log_print(ANDROID_LOG_INFO, "PTAM", "copied...");
+  /* while(!mbDone) */
+  /*   { */
       // We use two versions of each video frame:
       // One black and white (for processing by the tracker etc)
       // and one RGB, for drawing.
       
-      Image<Rgb<byte> > imFrameRGB(mVideoSource.Size());
-      Image<byte>  imFrameBW(mVideoSource.Size());
+      /* /1* Image<Rgb<byte> > imFrameRGB(mVideoSource.Size()); *1/ */
+      /* Image<byte>  imFrameBW(mVideoSource.Size()); */
       
       // Grab new video frame...
-      mVideoSource.GetAndFillFrameBWandRGB(imFrameBW, imFrameRGB);  
+      /* mVideoSource.GetAndFillFrameBWandRGB(imFrameBW, imFrameRGB); */  
       
       // Set up openGL
-      mGLWindow.SetupViewport();
-      mGLWindow.SetupVideoOrtho();
-      mGLWindow.SetupVideoRasterPosAndZoom();
+      /* mGLWindow.SetupViewport(); */
+      /* mGLWindow.SetupVideoOrtho(); */
+      /* mGLWindow.SetupVideoRasterPosAndZoom(); */
       
       if(mvCalibImgs.size() < 1)
 	*mgvnOptimizing = 0;
@@ -125,32 +143,32 @@ void CameraCalibrator::Run()
 	  mvCalibImgs[nToShow].Draw3DGrid(mCamera,true);
 	}
       
-      ostringstream ost;
-      ost << "Camera Calibration: Grabbed " << mvCalibImgs.size() << " images." << endl;
-      if(!*mgvnOptimizing)
-	{
-	  ost << "Take snapshots of the calib grid with the \"GrabFrame\" button," << endl;
-	  ost << "and then press \"Optimize\"." << endl;
-	  ost << "Take enough shots (4+) at different angles to get points " << endl;
-	  ost << "into all parts of the image (corners too.) The whole grid " << endl;
-	  ost << "doesn't need to be visible so feel free to zoom in." << endl;
-	}
-      else
-	{
-	  ost << "Current RMS pixel error is " << mdMeanPixelError << endl;
-	  ost << "Current camera params are  " << GV3::get_var("Camera.Parameters") << endl;
-	  ost << "(That would be a pixel aspect ratio of " 
-	      <<  mCamera.PixelAspectRatio() << ")" << endl;
-	  ost << "Check fit by looking through the grabbed images." << endl;
-	  ost << "RMS should go below 0.5, typically below 0.3 for a wide lens." << endl;
-	  ost << "Press \"save\" to save calibration to camera.cfg file and exit." << endl;
-	}
+      /* ostringstream ost; */
+      /* ost << "Camera Calibration: Grabbed " << mvCalibImgs.size() << " images." << endl; */
+      /* if(!*mgvnOptimizing) */
+	/* { */
+	  /* ost << "Take snapshots of the calib grid with the \"GrabFrame\" button," << endl; */
+	  /* ost << "and then press \"Optimize\"." << endl; */
+	  /* ost << "Take enough shots (4+) at different angles to get points " << endl; */
+	  /* ost << "into all parts of the image (corners too.) The whole grid " << endl; */
+	  /* ost << "doesn't need to be visible so feel free to zoom in." << endl; */
+	/* } */
+      /* else */
+	/* { */
+	  /* ost << "Current RMS pixel error is " << mdMeanPixelError << endl; */
+	  /* ost << "Current camera params are  " << GV3::get_var("Camera.Parameters") << endl; */
+	  /* ost << "(That would be a pixel aspect ratio of " */ 
+	      /* <<  mCamera.PixelAspectRatio() << ")" << endl; */
+	  /* ost << "Check fit by looking through the grabbed images." << endl; */
+	  /* ost << "RMS should go below 0.5, typically below 0.3 for a wide lens." << endl; */
+	  /* ost << "Press \"save\" to save calibration to camera.cfg file and exit." << endl; */
+	/* } */
 
-      mGLWindow.DrawCaption(ost.str());
-      mGLWindow.DrawMenus();
-      mGLWindow.HandlePendingEvents();
-      mGLWindow.swap_buffers();
-    }
+      /* mGLWindow.DrawCaption(ost.str()); */
+      /* mGLWindow.DrawMenus(); */
+      /* mGLWindow.HandlePendingEvents(); */
+      /* mGLWindow.swap_buffers(); */
+    /* } */
 }
 
 void CameraCalibrator::Reset()
@@ -158,7 +176,7 @@ void CameraCalibrator::Reset()
   *mCamera.mgvvCameraParams = ATANCamera::mvDefaultParams;
   if(*mgvnDisableDistortion) mCamera.DisableRadialDistortion();
   
-  mCamera.SetImageSize(mVideoSource.Size());
+  mCamera.SetImageSize(imFrameBW.size());
   mbGrabNextFrame =false;
   *mgvnOptimizing = false;
   mvCalibImgs.clear();
@@ -267,18 +285,3 @@ void CameraCalibrator::OptimizeOneStep()
     mvCalibImgs[n].mse3CamFromWorld = SE3<>::exp(vUpdate.slice(n * 6, 6)) * mvCalibImgs[n].mse3CamFromWorld;
   mCamera.UpdateParams(vUpdate.slice(nCamParamBase, NUMTRACKERCAMPARAMETERS));
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

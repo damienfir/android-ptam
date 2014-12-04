@@ -47,7 +47,7 @@ public:
     void reset_stereo();
 
     bool started;
-    long time;
+    long long time;
 
 private:
     /* CVD::Image<CVD::Rgb<CVD::byte> > mimFrameRGB; */

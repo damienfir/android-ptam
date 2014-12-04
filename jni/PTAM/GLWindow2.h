@@ -8,13 +8,15 @@
 //  caption line for text display. Also provides some handy GL helpers
 //  and a wrapper for CVD's text display routines.
 
-#include <cvd/glwindow.h>
+/* #include <cvd/glwindow.h> */
+#include <cvd/image.h>
 #include <TooN/TooN.h>
 
 class GLWindowMenu;
 
 
-class GLWindow2 : public CVD::GLWindow, public CVD::GLWindow::EventHandler
+class GLWindow2
+// : public CVD::GLWindow, public CVD::GLWindow::EventHandler
 {
 public:
   GLWindow2(CVD::ImageRef irSize, std::string sTitle);
@@ -49,13 +51,14 @@ protected:
   std::vector<GLWindowMenu*> mvpGLWindowMenus;
 
   CVD::ImageRef mirVideoSize;   // The size of the source video material.
+  CVD::ImageRef size() { return mirVideoSize; }
   
 
   // Event handling routines:
   /* virtual void on_key_down(GLWindow&, int key); */
-  virtual void on_mouse_move(GLWindow& win, CVD::ImageRef where, int state);
-  virtual void on_mouse_down(GLWindow& win, CVD::ImageRef where, int state, int button);
-  virtual void on_event(GLWindow& win, int event);
+  virtual void on_mouse_move(GLWindow2& win, CVD::ImageRef where, int state);
+  virtual void on_mouse_down(GLWindow2& win, CVD::ImageRef where, int state, int button);
+  virtual void on_event(GLWindow2& win, int event);
   CVD::ImageRef mirLastMousePos;
 
   // Storage for map viewer updates:
@@ -64,12 +67,4 @@ protected:
   
 
 };
-
-
-
-
-
-
-
-
 #endif

@@ -7,6 +7,7 @@ import static android.opengl.GLES10.glColor4f;
 import static android.opengl.GLES10.glViewport;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -23,26 +24,46 @@ import android.util.Log;
 public class BatchRenderer implements GLSurfaceView.Renderer {
 	
 	private List<GLRenderer> _list;
+	private long lastTime;
+	private double _fpsvec[];
+	private int _idx;
+	private int LENGTH = 24;
 	
 	public BatchRenderer() {
 		_list = new ArrayList<GLRenderer>();
+		lastTime = 0;
+		_fpsvec = new double[LENGTH];
+		_idx = 0;
 	}
 	
 	public void add(GLRenderer renderer) {
 		_list.add(renderer);
 	}
 	
+	private void update_fps() {
+		long t = System.nanoTime();
+		double fps = 1e8 / (t - lastTime);
+		lastTime = t;
+		_fpsvec[_idx] = fps;
+		_idx = (_idx+1) % LENGTH;
+		double avgfps = 0;
+		for (int i = 0; i<LENGTH; i++) avgfps += _fpsvec[i];
+		avgfps /= LENGTH;
+		Log.i("PTAM", "FPS: "+avgfps);
+	}
 	
 	@Override
 	public void onDrawFrame(GL10 arg0) {
-		glClear(GL_COLOR_BUFFER_BIT);
-		
-		for (GLRenderer r : _list) {
-			r.draw();
-		}
-		
-		// cancel color otherwise it will show on texture
-		glColor4f(1,1,1,1);
+		update_fps();
+//		Log.i("PTAM", "draw");
+//		glClear(GL_COLOR_BUFFER_BIT);
+//		
+//		for (GLRenderer r : _list) {
+//			r.draw();
+//		}
+//		
+//		// cancel color otherwise it will show on texture
+//		glColor4f(1,1,1,1);
 	}
 	
 

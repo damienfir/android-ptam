@@ -90,7 +90,8 @@ void System::update()
     glOrthof(-0.5,(double)_imsize.x - 0.5, (double) _imsize.y - 0.5, -0.5, -1.0, 1.0);
 
     store_time();
-    mpTracker->TrackFrame(mimFrameBW, true); // !bDrawAR && !bDrawMap);
+    glPointSize(5);
+    mpTracker->TrackFrame(mimFrameBW, false); // !bDrawAR && !bDrawMap);
 
     glPopMatrix();
 
@@ -119,8 +120,8 @@ void System::store_time()
 void System::draw_center()
 {
     glEnableClientState(GL_VERTEX_ARRAY);
-    glPointSize(20);
-    glColor4f(0,1,0,1);
+    glPointSize(30);
+    glColor4f(1,1,1,1);
     float v[] = {0,0};
     glVertexPointer(2, GL_FLOAT, 0, v);
     glDrawArrays(GL_POINTS, 0, 1);
@@ -146,7 +147,7 @@ void System::draw_painted()
 
     float realdepth = 20.f; // Real depth of the light to the object, given by the user.
     float z0 = prev[0][2]; // Depth at the beginning of the capture process.
-    float precision = 1.f; // Error margin. Here we give the user 1cm of error margin.
+    float precision = 10.f; // Error margin. Here we give the user 1cm of error margin.
     float ratio = z0/realdepth;
     float factor; // +1.0 if the user is 1cm to close to the object
                   // -1.0 if the user is 1cm to far from the object
@@ -168,7 +169,7 @@ void System::draw_painted()
     
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
-    glPointSize(10);
+    glPointSize(30);
     glVertexPointer(3, GL_FLOAT, 0, v);
     glColorPointer(4, GL_FLOAT, 0, c);
     glDrawArrays(GL_POINTS, 0, prev.size());

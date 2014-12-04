@@ -13,7 +13,7 @@ using namespace GVars3;
 using namespace TooN;
 
 GLWindow2::GLWindow2(ImageRef irSize, string sTitle)
-  : GLWindow(irSize, sTitle)
+  //: GLWindow(irSize, sTitle)
 {
 
 #ifdef WIN32
@@ -75,6 +75,7 @@ void GLWindow2::GUICommandHandler(string sCommand, string sParams)  // Called by
   cout << "! GLWindow::GUICommandHandler: unhandled command "<< sCommand << endl;
   exit(1);
 }; 
+
 
 void GLWindow2::DrawMenus()
 {
@@ -233,7 +234,7 @@ void GLWindow2::on_mouse_move(GLWindow& win, CVD::ImageRef where, int state)
   
 }
 
-void GLWindow2::on_mouse_down(GLWindow& win, CVD::ImageRef where, int state, int button)
+void GLWindow2::on_mouse_down(GLWindow2& win, CVD::ImageRef where, int state, int button)
 {
   bool bHandled = false;
   for(unsigned int i=0; !bHandled && i<mvpGLWindowMenus.size(); i++)
@@ -241,7 +242,7 @@ void GLWindow2::on_mouse_down(GLWindow& win, CVD::ImageRef where, int state, int
 
 }
 
-void GLWindow2::on_event(GLWindow& win, int event)
+void GLWindow2::on_event(GLWindow2& win, int event)
 {
   if(event==EVENT_CLOSE)
     GUI.ParseLine("quit");

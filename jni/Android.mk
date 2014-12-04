@@ -41,7 +41,8 @@ LOCAL_SRC_FILES += PTAM/ARDriver.cc                      \
 				   PTAM/SmallBlurryImage.cc                      \
 				   PTAM/System.cc                      \
 				   PTAM/Tracker.cc                      \
-				   # PTAM/CameraCalibrator.cc                      \
+#				   PTAM/CameraCalibrator.cc                      \
+				   # PTAM/GLWindow2.cc                      \
 
 LOCAL_STATIC_LIBRARIES += TooN
 LOCAL_STATIC_LIBRARIES += cpufeatures

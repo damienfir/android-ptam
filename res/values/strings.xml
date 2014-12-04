@@ -3,5 +3,7 @@
 
     <string name="hello">Hello World!</string>
     <string name="app_name">PTAM</string>
+    <string name="title_activity_calibrator">CalibratorActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
